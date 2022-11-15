@@ -1,5 +1,6 @@
 const express = require('express');
 const passport = require('passport');
+const cors = require('cors');
 const session = require('express-session');
 const { default: mongoose } = require('mongoose');
 const cookieParser = require('cookie-parser');
@@ -9,6 +10,7 @@ const MongoStore = require('connect-mongo');
 
 mongoose.connect("mongodb://localhost:27017/twitterbanner");
 
+const CLIENT_HOMEPAGE_URL = "http://localhost:3000";
 
 
 const app = express()
@@ -32,6 +34,15 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+//set up cors to allow requests from the client
+app.use(
+    cors({
+        origin: "http://localhost:3000", //allow the server to accept request from a different origin
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+        credentials: true //alow session cookie from browser to pass through
+    })
+);
 
 
 app.use(cookieParser());
@@ -77,6 +88,15 @@ app.get('/logout', authCheck, (req, res, next) => {
     
 })
 
+app.get("/test", (req, res, next) => {
+   
+    res.send({name: "Satpreet"});
+   
+    
+});
+
+
+
 
 app.get('/privileged-route', authCheck, (req, res, next) => {
     res.send("<h1>This is the privilege route</h1>")
@@ -86,13 +106,24 @@ app.get('/privileged-route', authCheck, (req, res, next) => {
 
 
 
-app.get('/auth/twitter', passport.authenticate("twitter"));
+app.get('/auth/twitter',  passport.authenticate("twitter"));
 
-
+app.get('/login/success', (req, res, next) => {
+    console.log("Here are the cookies...")
+    console.log(req.cookies);
+    if (req.user) {
+        res.json({user: req.user});
+    } else {
+        console.log("user is NOT found")
+        res.status(201)
+        res.status({message: "No user found"});
+    }
+    next()
+})
 
 app.get('/login-success', (req, res, next) => {
-    
-    res.redirect('/')
+   
+    res.redirect(CLIENT_HOMEPAGE_URL);
 })
 
 app.get('/login-fail', (req, res, next) => {
@@ -100,13 +131,16 @@ app.get('/login-fail', (req, res, next) => {
     res.send("Login failed");
 })
 
-app.get('/auth/twitter/callback', passport.authenticate("twitter", {
+
+//redirect to /login-success after successfully login via Twitter.
+app.get('/auth/twitter/callback',  passport.authenticate("twitter", {
     successRedirect: "/login-success",
     failureRedirect: "/login-fail"
 }));
 
 app.use((error, req, res, next) => {
     console.log(error);
+    next();
 })
 
 app.listen(8000, () => {

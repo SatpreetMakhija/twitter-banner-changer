@@ -13,8 +13,8 @@ const User = require('./user-model');
  */
 
 passport.serializeUser(function(user, done){
-    console.log(`[INFO]: SerializeUser function here with /n ${user.id}`);
-    console.log(user);
+    // console.log(`[INFO]: SerializeUser function here with /n ${user.id}`);
+    // console.log(user);
     done(null, user.id);
 });
 
@@ -26,8 +26,10 @@ passport.deserializeUser(function(userId, done){
     /**\
      * user gets attached to the request as req.user
      */
-    console.log(`[INFO]: DeserializeUser here. `)
+   
     User.findById(userId, function(err, user) {
+        console.log("here's some data")
+        console.log(user);
         done(null, user);
     })
     
@@ -48,7 +50,6 @@ passport.use(new TwitterStrategy({
     state: true,
 },
     async function (token, tokenSecret, profile, done){
-
         /**
          * Function called after authentication returned from twitter with user details
          * attached to profile object.  
@@ -62,7 +63,7 @@ passport.use(new TwitterStrategy({
         const currentUser = await User.findOne({
             twitterId: profile._json.id_str
         })
-
+       
         //Creates a new user if the database doesn't have one already.
         if (!currentUser) {
             const newUser = await new User({
@@ -72,7 +73,7 @@ passport.use(new TwitterStrategy({
                 profileImageUrl: profile._json.profile_image_url
             }).save();
             if (newUser) {
-                done(null, newUser);
+                return done(null, newUser);
             }
         }
 
