@@ -82,14 +82,15 @@ app.get('/logout', authCheck, (req, res, next) => {
         if (err) {
             return next(err);
         }else {
-            res.send("You have been logged out...")
+            res.send({message: "userLoggedOut"});
         }
     });
     
 })
 
 app.get("/test", (req, res, next) => {
-   
+    console.log("testing")
+   console.log(req.user);
     res.send({name: "Satpreet"});
    
     
