@@ -3,13 +3,18 @@ import { Button } from "react-bootstrap";
 import {useNavigate} from "react-router-dom";
 import UserAlbums from "../components/UserAlbums";
 import axios from "axios";
+import useStore from "../Store";
 
 
 function Home() {
-    let [user, setUser] = useState({});
-    let [isLoggedIn, setLogin] = useState(false);
+
+    const user = useStore(state => state.user);
+    const setUser = useStore(state => state.setUser);
+    const userLoginStatus = useStore(state => state.userLoginStatus);
+    const setUserLoginStatus = useStore(state => state.setUserLoginStatus);
+    
+
     let navigate = useNavigate();
-    let [tryAuthentication, setTryAuth] = useState(false);
 
     const checkUserLoginStatus = () => {
       console.log("inside useffect");
@@ -18,41 +23,22 @@ function Home() {
       if (response.status === 404) {
         console.log("No user found")
         setUser(null);
-        setLogin(false);
+        setUserLoginStatus(false);
       } else {
         console.log("User found");
         console.log(response.data.user);
-        setUser(response.data.user);
-        setLogin(true);
+
+        setUser({name: response.data.user.name, profileImageUrl: response.data.user.profileImageUrl});
+        setUserLoginStatus(true);
         
       }
-      
-      
-      // if (response.data !== "No user found") {
-      //     console.log(response.data);
-      //     setUser(response.user);
-      //     setLogin(true);
-      //   } else {
-      //     console.log("user not found from backend")
-      //     setUser(null);
-      //     setLogin(false);
-      //   }
       })
     }
 
     useEffect(checkUserLoginStatus, []);
 
 
-    // axios.get("http://localhost:8000/auth/login/success").then(response => {
-    // console.log(response)  
-    // if (response.status === 200) {
-      //   console.log("hello")
-      //   setUser(response.json().user)
-      //   setLogin(true);
-      // } 
-
-
-
+  
 
     const routeChange = () => {
         
@@ -62,21 +48,10 @@ function Home() {
     }
 
   const setLoginStatus = () => {
-    // // fetch("http://localhost:8000/auth", {
-    // //   method: "GET",
-    // //   credentials: "include",
-    // //   headers: {
-    // //     Accept: "application/json",
-    // //     "Content-Type": "application/json",
-    // //     "Acess-Control-Allow-Origin": "*",
-    // //     "Access-Control-Allow-Credentials": true
-    // //   }
-    // // }).then(response => console.log(response));
     console.log("onclick called")
     window.open("http://localhost:8000/auth/twitter", "_self");
     
-    // setLogin(!isLoggedIn);
-    // console.log(`The user's login status is ${isLoggedIn}`);
+  
   }
 
 
@@ -85,15 +60,9 @@ function Home() {
 
 
 
-// const DefaultHomeContent = () => <div className="App"> Dynamically change your twitter profile's banner <br/>
-// <a href="http://localhost:8000/auth">Sign in with Twitter</a></div>
-
-
-
-
   const LoggedInHomeContent = () => <div className='App'>
     <UserAlbums/>
-    Let's get started. {isLoggedIn? user.name: ''}<br/>
+    Let's get started. {userLoginStatus? user.name: ''}<br/>
     <Button variant="primary" onClick={routeChange}>Create an album</Button>
    
   </div>
@@ -101,7 +70,7 @@ function Home() {
     return (
        
         <div>
-            {isLoggedIn ?  <LoggedInHomeContent/> : <DefaultHomeContent/>}
+            {userLoginStatus ?  <LoggedInHomeContent/> : <DefaultHomeContent/>}
         </div>
     )
 

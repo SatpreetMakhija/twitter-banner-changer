@@ -1,10 +1,18 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import {BrowserRouter, Routes, Route} from "react-router-dom";
+import create from 'zustand';
+
 import MyNavBar from './components/MyNavBar';
 import Home from './pages/Home';
 import CreateAlbum from './pages/CreateAlbum';
 import ShowAlbum from './pages/ShowAlbum';
+
+const useStore = create((set) => ({
+  bears:0
+}))
+
+console.log(typeof(useStore));
 function App() { 
   return (
     <div>
