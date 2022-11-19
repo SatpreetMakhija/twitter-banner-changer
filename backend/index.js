@@ -158,3 +158,14 @@ app.listen(8000, () => {
     console.log("Server is up and running at port 8000")
 });
 
+
+/**
+ * Information on what these libraries do..
+ * 1. Multer: handle form-data type of POST methods. Basically, for handling file uploads via forms. 
+ * 2. cors: allows cross site access. Backend accepts request from frontend.
+ * 3. Express-session: handle sessions for users.
+ * 4. passport: works in sync with express-session to keep the user authenticated by serializing and deserializing.
+ * 5. cookie-Parser: parses cookies present in the request.
+ * 
+ */
+
