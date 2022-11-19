@@ -4,6 +4,7 @@ const cors = require('cors');
 const session = require('express-session');
 const { default: mongoose } = require('mongoose');
 const cookieParser = require('cookie-parser');
+const multer = require('multer');
 require('dotenv').config();
 require('./passport-setup')
 const MongoStore = require('connect-mongo');
@@ -12,6 +13,7 @@ mongoose.connect("mongodb://localhost:27017/twitterbanner");
 
 const CLIENT_HOMEPAGE_URL = "http://localhost:3000";
 
+const upload = multer({dest: './uploads'});
 
 const app = express()
 
@@ -46,6 +48,7 @@ app.use(
 
 
 app.use(cookieParser());
+
 
 app.get('/*', function(req, res, next) {
     if (req.headers.host.match(/^www\./) != null) {
@@ -103,6 +106,13 @@ app.get('/privileged-route', authCheck, (req, res, next) => {
     res.send("<h1>This is the privilege route</h1>")
 })
 
+
+app.post("/create-album", upload.array('banners'), (req, res, next) => {
+    console.log("Create Album was called. ")
+    console.log(req.body.albumname);
+    console.log(req.files);
+    res.send("File received");
+})
 
 
 
