@@ -12,14 +12,14 @@ const useStore = create((set, get) => ({
   setUserLoginStatus: () => set((state) => ({userLoginStatus: true})),
   resetUserLoginStatus: () => {
     set((state) => ({userLoginStatus: false}))
-    console.log(get().userLoginStatus)
+    // console.log(get().userLoginStatus)
   },
   setUser: (user) => {
     
     set((state) => (
       {user: {name: user.name, profileImageUrl: user.profileImageUrl}}
       ))
-    console.log(user);
+    // console.log(user);
     },
   resetUser: () => {
     set((state) => ({user: null}))

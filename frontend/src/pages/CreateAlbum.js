@@ -2,7 +2,7 @@ import React from "react";
 import { Form, Col, Row, Card, Button } from "react-bootstrap";
 import {useState} from "react";
 import axios from "axios";
-
+axios.defaults.withCredentials = true;
 function CreateAlbum() {
 
    
