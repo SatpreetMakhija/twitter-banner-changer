@@ -8,12 +8,22 @@ const multer = require('multer');
 require('dotenv').config();
 require('./passport-setup')
 const MongoStore = require('connect-mongo');
-
+const User = require('./user-model');
 mongoose.connect("mongodb://localhost:27017/twitterbanner");
 
 const CLIENT_HOMEPAGE_URL = "http://localhost:3000";
 
-const upload = multer({dest: './uploads'});
+
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, './uploads');
+    },
+    filename: function(req, file, cb) {
+        cb(null, new Date().toISOString() + file.originalname);
+    }
+})
+
+const upload = multer({storage: storage});
 
 const app = express()
 
@@ -59,6 +69,7 @@ app.get('/*', function(req, res, next) {
 });
 
 const authCheck = (req, res, next) => {
+    console.log("auth check was called..", req.user);
     if (!req.user) {
         res.json({
             authentication: false,
@@ -92,6 +103,7 @@ app.get('/logout', authCheck, (req, res, next) => {
 })
 
 app.get("/test", (req, res, next) => {
+//    User.findById()
     console.log("testing")
    console.log(req.user);
     res.send({name: "Satpreet"});
@@ -107,10 +119,33 @@ app.get('/privileged-route', authCheck, (req, res, next) => {
 })
 
 
-app.post("/create-album", upload.array('banners'), (req, res, next) => {
+app.post("/create-album", authCheck, upload.array('banners'), (req, res, next) => {
     console.log("Create Album was called. ")
     console.log(req.body.albumname);
-    console.log(req.files);
+    console.log(req.files[0].path);
+    const bannersURLs = req.files.map(file => {
+        return file.path;
+    })
+    const album = {
+        "albumName": req.body.albumname,
+        "createdOn": new Date(),
+        "bannersURLs": bannersURLs,
+        "frequencyOfUpdateInDays" : 3
+    }
+    // const album = {
+    //     "albumName": "satpreet",
+    //     "createdOn": new Date(),
+    //     "bannersURLs": ['a', 'b'],
+    //     "frequencyOfUpdateInDays" : 3
+    // }
+    
+    User.findOneAndUpdate({_id: req.user._id}, {$push: {albums: album}}, function(error, success) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log(success);
+        }
+    })
     res.send("File received");
 })
 
@@ -148,6 +183,15 @@ app.get('/auth/twitter/callback',  passport.authenticate("twitter", {
     successRedirect: "/login-success",
     failureRedirect: "/login-fail"
 }));
+
+
+app.get('/image', (req, res, next) => {
+
+    console.log("sending file...")
+    res.sendFile('/Users/satpreetmakhija/Documents/startups/twitter-banner-changer/backend/uploads/x');
+
+})
+
 
 app.use((error, req, res, next) => {
     console.log(error);

@@ -4,7 +4,13 @@ const userSchema = new Schema({
     name: String,
     screenName: String,
     twitterId: String,
-    profileImageUrl: String
+    profileImageUrl: String,
+    albums: [{
+        albumName: String,
+        createdOn: Date,
+        bannersURLs: [String],
+        frequencyOfUpdateInDays : Number
+    }]
 });
 
 const User = mongoose.model("user", userSchema);
