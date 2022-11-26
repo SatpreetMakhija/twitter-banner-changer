@@ -60,6 +60,7 @@ passport.use(new TwitterStrategy({
          * done: callback. Serializes the user. 
          * We'll later add the logic to add the user to the User database.
          */
+       
         const currentUser = await User.findOne({
             twitterId: profile._json.id_str
         })
@@ -70,8 +71,11 @@ passport.use(new TwitterStrategy({
                 name: profile._json.name,
                 screenName: profile._json.screen_name,
                 twitterId: profile._json.id_str,
-                profileImageUrl: profile._json.profile_image_url
+                profileImageUrl: profile._json.profile_image_url,
+                accessToken: token,
+                tokenSecret: tokenSecret
             }).save();
+            console.log(newUser);
             if (newUser) {
                 return done(null, newUser);
             }

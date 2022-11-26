@@ -5,11 +5,14 @@ const userSchema = new Schema({
     screenName: String,
     twitterId: String,
     profileImageUrl: String,
+    accessToken: String,
+    tokenSecret: String,
     albums: [{
         albumName: String,
         createdOn: Date,
         bannersURLs: [String],
-        frequencyOfUpdateInDays : Number
+        frequencyOfUpdateInDays : Number,
+       
     }]
 });
 
