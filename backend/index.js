@@ -18,42 +18,85 @@ const { createBullBoard } = require("@bull-board/api");
 const { BullAdapter } = require("@bull-board/api/bullAdapter");
 const { ExpressAdapter } = require("@bull-board/express");
 
-const someQueue = new Queue("someQueue", process.env.REDIS_URL);
-someQueue.on("error", (err) => console.log(err));
-
-const someOtherQueue = new Queue("someOtherQueue", process.env.REDIS_URL);
-someQueue.on("error", (err) => console.log(err));
+const bannerChangeAPICallsQueue = new Queue("bannerChangeAPICallsQueue", process.env.REDIS_URL);
+bannerChangeAPICallsQueue.on("error", (err) => console.log(err));
 
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath("/admin/queues");
 
 const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
-  queues: [new BullAdapter(someQueue), new BullAdapter(someOtherQueue)],
+  queues: [ new BullAdapter(bannerChangeAPICallsQueue)],
   serverAdapter: serverAdapter,
 });
 
-someQueue.add({
-  img_url:
-    "https://pbs.twimg.com/profile_banners/1120369892602142721/1666182809/600x200",
-  accessToken: "x",
-  tokenSecret: "y",
-  nextCallAt: "10:00AM-IST",
-  userId: "abc",
-}
-);
 
 
 
-someQueue.process(function(job, done) {
-    console.log(job.data);
-    done(null, job.data.nextCallAt);
-})
 
-someQueue.on('completed', function(job, result){
-    console.log("The job got completed.")
-    console.log(job);
+// someQueue.process(function(job, done) {
+//     console.log(job.data);
+//     done(null, job.data.nextCallAt);
+// })
+
+bannerChangeAPICallsQueue.process(function(job, done) {
+ /**
+  * parameters passed are user's id and bannersURLCounter
+  * Using user's id, find the album urls, accessToken, tokenSecret, 
+  * Then call the Twitter API
+  */
+  console.log("Inside processing function...")
+    const user = User.findById(job.data.userId).exec();
+    user.then((user) => {
+        /**
+         * Here we have the user details now. 
+         * We can call the api here. We have all the data available. 
+         * 
+         */
+        console.log("The user's details are");
+        console.log(user.albums[0].bannersURLs[job.data.bannersURLsCounter]);
+        if (job.data.bannersURLsCounter <= user.albums.length) {
+            const result = {bannersURLsCounter: job.data.bannersURLsCounter + 1, frequency: user.albums[0].frequencyOfUpdateInHours}
+            done(null, result);
+        } else {
+            const result = {bannersURLsCounter: 0, frequency: user.albums[0].frequencyOfUpdateInHours};
+            done(null, result);
+        }
+
+    });
+    
+    
+});
+
+/**
+ * Event listener for the queue...
+ * When a job gets completed, we add the next one with the delay value as a paramter.
+ */
+// someQueue.on('completed', function(job, result){
+//     console.log("The job got completed.")
+//     console.log(job);
+//     console.log(result);
+// }) 
+
+bannerChangeAPICallsQueue.on('completed', function(job, result) {
+    /**
+     * Fetch the frequency of update section in the User database from the album
+     * actually, we don't need the currentTime. Just get the frequency of update section.
+     * and add a delay accordingly. 
+     * Example. Say, frequency is 15 minutes.
+     * delay = 1000 * 60 * 15 
+     * for bannerURLsCounter value check if you have reached the end of the array. If yes, set the 
+     * bannerURLsCounter to 0. 
+     *  */ 
+    console.log("Inside Completed Event");
+    console.log("The userId is ");
+    console.log(job.data.userId);
+    console.log("The result is ")
     console.log(result);
-}) 
+
+    const delayTime = result.frequency * 1000 * 10 
+    bannerChangeAPICallsQueue.add({userId: job.data.userId, bannersURLsCounter: result.bannersURLsCounter}, {delay: delayTime});
+    
+})
 
 
 
@@ -71,6 +114,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const app = express();
+
+app.use(express.static(__dirname + '/uploads'));
 app.use("/admin/queues", serverAdapter.getRouter());
 
 /**
@@ -171,14 +216,9 @@ app.post(
       albumName: req.body.albumname,
       createdOn: new Date(),
       bannersURLs: bannersURLs,
-      frequencyOfUpdateInDays: 3,
+      frequencyOfUpdateInHours: req.body.frequency,
     };
-    // const album = {
-    //     "albumName": "satpreet",
-    //     "createdOn": new Date(),
-    //     "bannersURLs": ['a', 'b'],
-    //     "frequencyOfUpdateInDays" : 3
-    // }
+    
 
     User.findOneAndUpdate(
       { _id: req.user._id },
@@ -191,9 +231,32 @@ app.post(
         }
       }
     );
+
+      /**
+       * Add the job producer code here...
+       */
     res.send("File received");
   }
 );
+
+app.post("/set-album", (req, res, next) => {
+   
+    // console.log(req.user);
+    /**
+     * pass albumName/id as a parameter. 
+     * find the album from the user collection.
+     * 
+     * 
+     * 
+     * To make this call we need the following data of the user.
+     * AccessToken, TokenSecret, bannersURLsCounter = 0,   
+     */
+    const userId = "6381aec9c99e41ffca669a4d"
+    const bannersURLsCounter = 0;
+    
+    bannerChangeAPICallsQueue.add({userId: userId, bannersURLsCounter: bannersURLsCounter});
+})
+
 
 app.get("/auth/twitter", passport.authenticate("twitter"));
 

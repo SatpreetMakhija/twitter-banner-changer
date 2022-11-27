@@ -11,7 +11,7 @@ const userSchema = new Schema({
         albumName: String,
         createdOn: Date,
         bannersURLs: [String],
-        frequencyOfUpdateInDays : Number,
+        frequencyOfUpdateInHours : Number,
        
     }]
 });
