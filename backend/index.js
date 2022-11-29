@@ -17,7 +17,8 @@ const Queue = require("bull");
 const { createBullBoard } = require("@bull-board/api");
 const { BullAdapter } = require("@bull-board/api/bullAdapter");
 const { ExpressAdapter } = require("@bull-board/express");
-
+const TwitterClient = require('twitter-api-client').TwitterClient;
+console.log(typeof(TwitterClient))
 const bannerChangeAPICallsQueue = new Queue("bannerChangeAPICallsQueue", process.env.REDIS_URL);
 bannerChangeAPICallsQueue.on("error", (err) => console.log(err));
 
@@ -44,26 +45,26 @@ bannerChangeAPICallsQueue.process('/Users/satpreetmakhija/Documents/startups/twi
 //     console.log(result);
 // }) 
 
-bannerChangeAPICallsQueue.on('completed', function(job, result) {
-    /**
-     * Fetch the frequency of update section in the User database from the album
-     * actually, we don't need the currentTime. Just get the frequency of update section.
-     * and add a delay accordingly. 
-     * Example. Say, frequency is 15 minutes.
-     * delay = 1000 * 60 * 15 
-     * for bannerURLsCounter value check if you have reached the end of the array. If yes, set the 
-     * bannerURLsCounter to 0. 
-     *  */ 
-    console.log("Inside Completed Event");
-    console.log("The userId is ");
-    console.log(job.data.userId);
-    console.log("The result is ")
-    console.log(result);
+// bannerChangeAPICallsQueue.on('completed', function(job, result) {
+//     /**
+//      * Fetch the frequency of update section in the User database from the album
+//      * actually, we don't need the currentTime. Just get the frequency of update section.
+//      * and add a delay accordingly. 
+//      * Example. Say, frequency is 15 minutes.
+//      * delay = 1000 * 60 * 15 
+//      * for bannerURLsCounter value check if you have reached the end of the array. If yes, set the 
+//      * bannerURLsCounter to 0. 
+//      *  */ 
+//     console.log("Inside Completed Event");
+//     console.log("The userId is ");
+//     console.log(job.data.userId);
+//     console.log("The result is ")
+//     console.log(result);
 
-    const delayTime = result.frequency * 1000 * 10 
-    bannerChangeAPICallsQueue.add({userId: job.data.userId, bannersURLsCounter: result.bannersURLsCounter}, {delay: delayTime});
+//     const delayTime = result.frequency * 1000 * 10 
+//     bannerChangeAPICallsQueue.add({userId: job.data.userId, bannersURLsCounter: result.bannersURLsCounter}, {delay: delayTime});
     
-})
+// })
 
 
 
@@ -206,7 +207,7 @@ app.post(
   }
 );
 
-app.post("/set-album", (req, res, next) => {
+app.post("/set-album", async (req, res, next) => {
    
     // console.log(req.user);
     /**
@@ -222,6 +223,22 @@ app.post("/set-album", (req, res, next) => {
     const bannersURLsCounter = 0;
     
     bannerChangeAPICallsQueue.add({userId: userId, bannersURLsCounter: bannersURLsCounter});
+    // const twitterClient = new TwitterClient({
+    //   apiKey: process.env.TWITTER_CONSUMER_KEY,
+    //   apiSecret: process.env.TWITTER_CONSUMER_SECRET,
+    //   accessToken: process.env.TWITTER_ACCESS_TOKEN,
+    //   accessTokenSecret: process.env.TWITTER_ACCESS_SECRET
+    // });
+
+    // console.log(twitterClient);
+    // try {
+    //   const data = await twitterClient.trends.trendsAvailable();
+    // console.log(data);
+    // } catch(error) {
+    //   console.log(error);
+    // }
+    
+    res.send({"message": "Album set."});
 })
 
 
@@ -281,5 +298,6 @@ app.listen(8000, () => {
  * 3. Express-session: handle sessions for users.
  * 4. passport: works in sync with express-session to keep the user authenticated by serializing and deserializing.
  * 5. cookie-Parser: parses cookies present in the request.
+ * 6. Bull: allows us to connect to redis database and use a queueu, worker, create jobs. 
  *
  */
