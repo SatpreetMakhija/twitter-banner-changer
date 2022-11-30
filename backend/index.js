@@ -61,9 +61,18 @@ bannerChangeAPICallsQueue.process('/Users/satpreetmakhija/Documents/startups/twi
 //     console.log("The result is ")
 //     console.log(result);
 
+
+
 //     const delayTime = result.frequency * 1000 * 10 
 //     bannerChangeAPICallsQueue.add({userId: job.data.userId, bannersURLsCounter: result.bannersURLsCounter}, {delay: delayTime});
     
+      /**
+       * 
+       * the only thing passed as the result will be the frequency conuter. bannersURLsCounter (that too maybe we can keep it in the album object itself)
+      * userId = job.data.userId, job.data.albumId, for now we pass the delay as well. 
+      */
+
+
 // })
 
 
@@ -221,22 +230,8 @@ app.post("/set-album", async (req, res, next) => {
      */
     const userId = "6381aec9c99e41ffca669a4d"
     const bannersURLsCounter = 0;
-    
-    bannerChangeAPICallsQueue.add({userId: userId, bannersURLsCounter: bannersURLsCounter});
-    // const twitterClient = new TwitterClient({
-    //   apiKey: process.env.TWITTER_CONSUMER_KEY,
-    //   apiSecret: process.env.TWITTER_CONSUMER_SECRET,
-    //   accessToken: process.env.TWITTER_ACCESS_TOKEN,
-    //   accessTokenSecret: process.env.TWITTER_ACCESS_SECRET
-    // });
-
-    // console.log(twitterClient);
-    // try {
-    //   const data = await twitterClient.trends.trendsAvailable();
-    // console.log(data);
-    // } catch(error) {
-    //   console.log(error);
-    // }
+    const albumId = "63835fcee310d04eee93326c";
+    bannerChangeAPICallsQueue.add({userId: userId, bannersURLsCounter: bannersURLsCounter, albumId: albumId});
     
     res.send({"message": "Album set."});
 })
