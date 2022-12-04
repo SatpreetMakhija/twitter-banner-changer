@@ -6,8 +6,6 @@ import Button from "react-bootstrap/Button";
 function UserAlbums(props) {
   
   const albums = props.albums;
-  console.log("The first album is", albums[0])
-
   let navigate = useNavigate();
   const routeChange = (e) => {
     let  path = "/album/" + e.target.getAttribute('albumId');

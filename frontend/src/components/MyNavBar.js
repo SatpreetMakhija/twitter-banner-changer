@@ -2,11 +2,9 @@ import React from "react";
 import {Container, Navbar, Button, Image} from 'react-bootstrap';
 import useStore from "../Store";
 import axios from "axios";
-import {Navigate} from "react-router-dom";
 
 function MyNavBar () {
 
-    // const navigate = useNavigate();
 
     const user = useStore(state => state.user);
     const userLoginStatus = useStore(state => state.user);
@@ -19,6 +17,7 @@ function MyNavBar () {
         console.log("user is logged out..")
         resetUserLoginStatus();
         resetUser();
+        window.location.href = "/";
       } else {
         //Show a sandwitch in frontend saying the logout did not work. Try again. 
         console.log("Some error occured while logging out..")
