@@ -35,50 +35,6 @@ const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
 bannerChangeAPICallsQueue.process('/Users/satpreetmakhija/Documents/startups/twitter-banner-changer/backend/processor.js');
 
 
-/**
- * Event listener for the queue...
- * When a job gets completed, we add the next one with the delay value as a paramter.
- */
-// someQueue.on('completed', function(job, result){
-//     console.log("The job got completed.")
-//     console.log(job);
-//     console.log(result);
-// }) 
-
-// bannerChangeAPICallsQueue.on('completed', function(job, result) {
-//     /**
-//      * Fetch the frequency of update section in the User database from the album
-//      * actually, we don't need the currentTime. Just get the frequency of update section.
-//      * and add a delay accordingly. 
-//      * Example. Say, frequency is 15 minutes.
-//      * delay = 1000 * 60 * 15 
-//      * for bannerURLsCounter value check if you have reached the end of the array. If yes, set the 
-//      * bannerURLsCounter to 0. 
-//      *  */ 
-//     console.log("Inside Completed Event");
-//     console.log("The userId is ");
-//     console.log(job.data.userId);
-//     console.log("The result is ")
-//     console.log(result);
-
-
-
-//     const delayTime = result.frequency * 1000 * 10 
-//     bannerChangeAPICallsQueue.add({userId: job.data.userId, bannersURLsCounter: result.bannersURLsCounter}, {delay: delayTime});
-    
-      /**
-       * 
-       * the only thing passed as the result will be the frequency conuter. bannersURLsCounter (that too maybe we can keep it in the album object itself)
-      * userId = job.data.userId, job.data.albumId, for now we pass the delay as well. 
-      */
-
-
-// })
-
-
-
-
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads");
@@ -167,16 +123,6 @@ app.get("/logout", authCheck, (req, res, next) => {
   });
 });
 
-app.get("/test", (req, res, next) => {
-  //    User.findById()
-  console.log("testing");
-  console.log(req.user);
-  res.send({ name: "Satpreet" });
-});
-
-app.get("/privileged-route", authCheck, (req, res, next) => {
-  res.send("<h1>This is the privilege route</h1>");
-});
 
 app.post(
   "/create-album",
@@ -184,10 +130,10 @@ app.post(
   upload.array("banners"),
   (req, res, next) => {
     console.log("Create Album was called. ");
-    console.log(req.body.albumname);
-    console.log(req.files[0].path);
     const bannersURLs = req.files.map((file) => {
-      return file.path;
+      //slice to remove substring prefix 'uploads/' 
+      return file.path.slice(8);
+      
     });
     const album = {
       albumName: req.body.albumname,
@@ -202,9 +148,10 @@ app.post(
       { $push: { albums: album } },
       function (error, success) {
         if (error) {
-          console.log(error);
+          res.status(500);
+          res.send({message: "An error occured while creating the album"});
         } else {
-          console.log(success);
+          res.send({message: "Album created successfully"});
         }
       }
     );
@@ -212,7 +159,6 @@ app.post(
       /**
        * Add the job producer code here...
        */
-    res.send("File received");
   }
 );
 
@@ -292,12 +238,6 @@ app.get(
   })
 );
 
-app.get("/image", (req, res, next) => {
-  console.log("sending file...");
-  res.sendFile(
-    "/Users/satpreetmakhija/Documents/startups/twitter-banner-changer/backend/uploads/x"
-  );
-});
 
 app.use((error, req, res, next) => {
   console.log(error);
