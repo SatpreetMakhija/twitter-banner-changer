@@ -5,7 +5,7 @@ const path = require("path");
 const MongoStore = require("connect-mongo");
 const User = require("./user-model");
 mongoose.connect("mongodb://localhost:27017/twitterbanner");
-const getConfigForTwitterAPICall = require('./createRequest');
+const getConfigForTwitterAPICall = require('./createConfigForBannerChangeRequest');
 const { default: axios } = require("axios");
 module.exports = function (job, done) {
   /**
