@@ -222,6 +222,7 @@ app.post("/set-album", async (req, res, next) => {
     /**
      * pass albumName/id as a parameter. 
      * find the album from the user collection.
+     * Set the attribute current_album_id to the album_id you get in the req object. 
      * 
      * 
      * 
@@ -236,6 +237,22 @@ app.post("/set-album", async (req, res, next) => {
     res.send({"message": "Album set."});
 })
 
+app.get('/album/:albumid', authCheck, (req, res, next) => {
+  const albumId = req.params.albumid;
+  User.findById(req.user._id, (err, user) => {
+    if (err) {
+      console.log("Could not find a user with this user id");
+    } else {
+      let album = user.albums.find(album => album._id.toString() === albumId);
+      if (album) {
+        res.send({album: album});
+      } else {
+        res.send({message: "You don't have an album with this id"});
+      }
+     
+    }
+  })
+})
 
 app.get("/auth/twitter", passport.authenticate("twitter"));
 
@@ -243,7 +260,13 @@ app.get("/login/success", (req, res, next) => {
   console.log("Here are the cookies...");
   console.log(req.cookies);
   if (req.user) {
-    res.json({ user: req.user });
+    let user = {
+      name: req.user.name,
+      profileImageUrl: req.user.profileImageUrl,
+      id: req.user._id,
+      albums: req.user.albums
+    }
+    res.json({ user: user });
   } else {
     console.log("user is NOT found");
     res.status(201);

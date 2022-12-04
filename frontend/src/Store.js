@@ -17,7 +17,7 @@ const useStore = create((set, get) => ({
   setUser: (user) => {
     
     set((state) => (
-      {user: {name: user.name, profileImageUrl: user.profileImageUrl}}
+      {user: {name: user.name, profileImageUrl: user.profileImageUrl, id: user.id}}
       ))
     // console.log(user);
     },

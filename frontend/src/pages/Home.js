@@ -12,6 +12,7 @@ function Home() {
     const setUser = useStore(state => state.setUser);
     const userLoginStatus = useStore(state => state.userLoginStatus);
     const setUserLoginStatus = useStore(state => state.setUserLoginStatus);
+    const [userAlbums, setUserAlbums] = useState(null);
     
 
     let navigate = useNavigate();
@@ -25,11 +26,13 @@ function Home() {
         setUser(null);
         setUserLoginStatus(false);
       } else {
-        console.log("User found");
-        console.log(response.data.user);
+       
+        
 
-        setUser({name: response.data.user.name, profileImageUrl: response.data.user.profileImageUrl});
+        setUser({name: response.data.user.name, profileImageUrl: response.data.user.profileImageUrl, id: response.data.user.id});
         setUserLoginStatus(true);
+        setUserAlbums(response.data.user.albums);
+      
         
       }
       })
@@ -61,7 +64,7 @@ function Home() {
 
 
   const LoggedInHomeContent = () => <div className='App'>
-    <UserAlbums/>
+    <UserAlbums albums={userAlbums}/>
     Let's get started. {userLoginStatus? user.name: ''}<br/>
     <Button variant="primary" onClick={routeChange}>Create an album</Button>
    

@@ -16,7 +16,7 @@ function App() {
             <Route path="/" exact element={<Home/>}/>
             <Route path = "/create-album" element={<CreateAlbum/>}/>
             <Route path= "/showimg" element = {<ShowImg/>}/>
-            <Route path = "/:userid/:albumid" element={<ShowAlbum/>}/>
+            <Route path = "/album/:albumid" element={<ShowAlbum/>}/>
           </Routes>
         </BrowserRouter>
       
