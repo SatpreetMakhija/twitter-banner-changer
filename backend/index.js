@@ -4,6 +4,7 @@ const cors = require("cors");
 const session = require("express-session");
 const { default: mongoose } = require("mongoose");
 const cookieParser = require("cookie-parser");
+const bodyParser = require('body-parser');
 const multer = require("multer");
 require("dotenv").config();
 require("./passport-setup");
@@ -50,7 +51,7 @@ const app = express();
 
 app.use(express.static(__dirname + '/uploads'));
 app.use("/admin/queues", serverAdapter.getRouter());
-
+app.use(bodyParser.json());
 /**
  * Initialize session using the express-session library. Later, we'll set
  * the store value as well to save the session in our database.
@@ -139,7 +140,7 @@ app.post(
       albumName: req.body.albumname,
       createdOn: new Date(),
       bannersURLs: bannersURLs,
-      frequencyOfUpdateInHours: req.body.frequency,
+      frequencyOfUpdateInHours: null
     };
     
 
@@ -162,25 +163,28 @@ app.post(
   }
 );
 
-app.post("/set-album", async (req, res, next) => {
+app.post("/set-album", authCheck, async (req, res, next) => {
    
-    // console.log(req.user);
-    /**
-     * pass albumName/id as a parameter. 
-     * find the album from the user collection.
-     * Set the attribute current_album_id to the album_id you get in the req object. 
-     * 
-     * 
-     * 
-     * To make this call we need the following data of the user.
-     * AccessToken, TokenSecret, bannersURLsCounter = 0,   
-     */
-    const userId = "6381aec9c99e41ffca669a4d"
+    const userId = req.user._id;
     const bannersURLsCounter = 0;
-    const albumId = "63835fcee310d04eee93326c";
-    bannerChangeAPICallsQueue.add({userId: userId, bannersURLsCounter: bannersURLsCounter, albumId: albumId});
-    
-    res.send({"message": "Album set."});
+    const albumId = req.body.albumId;
+    const bannerUpdateFrequency = req.body.bannerUpdateFrequency;
+
+    //Find album in Users collection and set the frequencyOfUpdateInHours key's value to bannerUpdateFrequency obtained in req.body
+    //Set user.currentAlbumIn Rotation to albumId; 
+    //Add the album to the API Calls queue. 
+
+    User.findById(userId, async function(err, user) {
+      if (err) {
+        next(err);
+      } else {
+        user.albums.find(album => album._id.toString() === albumId).frequencyOfUpdateInHours = Number(bannerUpdateFrequency);
+        user.currentAlbumInRotation = String(albumId);
+        await user.save();
+        bannerChangeAPICallsQueue.add({userId: userId, bannersURLsCounter: bannersURLsCounter, albumId: albumId});
+        res.send({"message": "Album set."});
+      }
+    })    
 })
 
 app.get('/album/:albumid', authCheck, (req, res, next) => {

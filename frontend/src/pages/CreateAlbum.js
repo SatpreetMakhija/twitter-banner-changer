@@ -7,7 +7,7 @@ axios.defaults.withCredentials = true;
 function CreateAlbum() {
 
    
-    const [formValues, setFormValues] = useState({albumName: "", banners: [], frequency: 0});
+    const [formValues, setFormValues] = useState({albumName: "", banners: []});
     const [showToast, setShowToast] = useState(false);
 
     const handleSubmit = (event) => {
@@ -15,7 +15,6 @@ function CreateAlbum() {
         console.log(formValues);
         let data = new FormData();
         data.append("albumname", formValues.albumName);
-        data.append("frequency", formValues.frequency);
         // data.append("banners", formValues.banners);
         for (var x = 0 ; x < formValues.banners.length; x++) {
           data.append(`banners`, formValues.banners[x]);
@@ -51,7 +50,7 @@ function CreateAlbum() {
 
 
         //do validation check. According to that return a message on the screen. 
-        setFormValues({albumName: "", banners: [], frequency: 0})
+        setFormValues({albumName: "", banners: []})
         
         // event.target.reset();
     }
@@ -83,9 +82,6 @@ function CreateAlbum() {
                 <Form.Label>Multiple files input example</Form.Label>
                 <Form.Control type="file" multiple onChange={handleFileChange} name="banners" />
               </Form.Group>
-              How many times a day do you want to change your Twitter banner?
-              <Form.Control size="lg" type="number" placeholder="How many times a day should we change your banner?"  value={formValues.frequency} name="frequency" onChange={handleTextChange} />
-                <br/>
                 <Button variant="primary" type="submit">
                     Submit
                 </Button>

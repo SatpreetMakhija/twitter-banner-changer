@@ -3,6 +3,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 function SetBannerUpdateFrequencyModal(props) {
   const url_parameters = useParams();
   const album_id = url_parameters.albumid;
@@ -16,10 +17,29 @@ function SetBannerUpdateFrequencyModal(props) {
     setBannerUpdateFrequency(e.target.value);
   };
 
-  const setAlbumFrequency = () => {
+  const setAlbumFrequency = async () => {
     //make axios call here to set the album.
     //to do so get album id from url.
     //call api set-album
+    try {
+      let response = await axios.post(
+        "http://localhost:8000/set-album",
+        {
+          albumId: album_id,
+          bannerUpdateFrequency: bannerUpdateFrequency,
+        },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      console.log(response)
+    } catch (error) {
+      //Handle error...
+    }
+
     let response = { status: "200" };
     //use a sandwich to give this update to the user.
     if (response.status === "200") {
