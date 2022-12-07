@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const multer = require("multer");
 require("dotenv").config();
 require("./passport-setup");
+const axios = require('axios');
 const MongoStore = require("connect-mongo");
 const User = require("./user-model");
 mongoose.connect("mongodb://localhost:27017/twitterbanner");
@@ -19,7 +20,6 @@ const { createBullBoard } = require("@bull-board/api");
 const { BullAdapter } = require("@bull-board/api/bullAdapter");
 const { ExpressAdapter } = require("@bull-board/express");
 const TwitterClient = require('twitter-api-client').TwitterClient;
-console.log(typeof(TwitterClient))
 const bannerChangeAPICallsQueue = new Queue("bannerChangeAPICallsQueue", process.env.REDIS_URL);
 bannerChangeAPICallsQueue.on("error", (err) => console.log(err));
 
@@ -34,6 +34,20 @@ const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
 
 
 bannerChangeAPICallsQueue.process('/Users/satpreetmakhija/Documents/startups/twitter-banner-changer/backend/processor.js');
+
+bannerChangeAPICallsQueue.on('completed', function(job, result) {
+  /**
+   * Fetch frequency of update from user database. 
+   * Use this value to add the next job in queue. 
+   * 
+   * 
+   */
+  console.log("on complete event trigerred")
+  const delayTime = 1000*5 //1 minute
+  bannerChangeAPICallsQueue.add({userId: job.data.userId, bannersURLsCounter: result.bannersURLsCounter, albumId: job.data.albumId}, {delay: delayTime});
+}) 
+
+
 
 
 const storage = multer.diskStorage({
@@ -95,7 +109,6 @@ app.get("/*", function (req, res, next) {
 });
 
 const authCheck = (req, res, next) => {
-  console.log("auth check was called..", req.user);
   if (!req.user) {
     res.json({
       authentication: false,
@@ -130,7 +143,6 @@ app.post(
   authCheck,
   upload.array("banners"),
   (req, res, next) => {
-    console.log("Create Album was called. ");
     const bannersURLs = req.files.map((file) => {
       //slice to remove substring prefix 'uploads/' 
       return file.path.slice(8);
@@ -181,10 +193,27 @@ app.post("/set-album", authCheck, async (req, res, next) => {
         user.albums.find(album => album._id.toString() === albumId).frequencyOfUpdateInHours = Number(bannerUpdateFrequency);
         user.currentAlbumInRotation = String(albumId);
         await user.save();
-        bannerChangeAPICallsQueue.add({userId: userId, bannersURLsCounter: bannersURLsCounter, albumId: albumId});
-        res.send({"message": "Album set."});
+        bannerChangeAPICallsQueue.add({userId: userId, bannersURLsCounter: bannersURLsCounter, albumId: albumId}).then(() => 
+        res.send({"message": "Album set."}));
+        
       }
     })    
+
+
+    /**
+     * 
+     * This API call to change the banner works. KEEP THIS AS REFERENCE POINT
+     */
+    // const getConfigForTwitterAPICall = require('./createConfigForBannerChangeRequest');
+    // const path = require("path");
+    // let baseURL = "https://api.twitter.com/1.1/account/update_profile_banner.json";
+    // const bannerImgPath =
+    //   path.resolve(__dirname) + '/uploads/' +  "2022-12-06T12:32:11.492ZScreenshot 2022-12-06 at 1.40.18 PM.png"
+    //   const accessToken = "1423630007310553093-NInp9RLjwty1qTOPPHjEAUZkZxQWdN";
+    //   const tokenSecret = "dqZQGlNRWUyhFCwncxKbhzMndfhVlPCVIWHHDKHSK4Hsi";
+    // let config = getConfigForTwitterAPICall(process.env.TWITTER_CONSUMER_KEY, process.env.TWITTER_CONSUMER_SECRET, accessToken, tokenSecret, "POST", bannerImgPath, baseURL);
+    // let response = await axios(config);
+    // console.log(response);
 })
 
 app.get('/album/:albumid', authCheck, (req, res, next) => {
@@ -207,8 +236,6 @@ app.get('/album/:albumid', authCheck, (req, res, next) => {
 app.get("/auth/twitter", passport.authenticate("twitter"));
 
 app.get("/login/success", (req, res, next) => {
-  console.log("Here are the cookies...");
-  console.log(req.cookies);
   if (req.user) {
     let user = {
       name: req.user.name,

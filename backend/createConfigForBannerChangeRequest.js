@@ -15,7 +15,7 @@ function getConfigForTwitterAPICall(
   /**
    * This function creates the signature needed to add in the url.
    */
-  let baseURL = baseURL;
+  var baseURL = baseURL;
   let httpMethod = httpMethodAllCaps;
   var parameters = {
     oauth_consumer_key: consumerKey,
