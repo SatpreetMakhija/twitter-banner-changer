@@ -7,6 +7,7 @@ const userSchema = new Schema({
     profileImageUrl: String,
     accessToken: String,
     tokenSecret: String,
+    currentAlbumInRotation: String,
     albums: [{
         albumName: String,
         createdOn: Date,

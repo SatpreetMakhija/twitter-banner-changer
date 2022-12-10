@@ -73,7 +73,8 @@ passport.use(new TwitterStrategy({
                 twitterId: profile._json.id_str,
                 profileImageUrl: profile._json.profile_image_url,
                 accessToken: token,
-                tokenSecret: tokenSecret
+                tokenSecret: tokenSecret,
+                currentAlbumInRotation: null
             }).save();
             console.log(newUser);
             if (newUser) {

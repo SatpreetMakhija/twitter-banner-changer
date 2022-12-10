@@ -4,9 +4,11 @@ const cors = require("cors");
 const session = require("express-session");
 const { default: mongoose } = require("mongoose");
 const cookieParser = require("cookie-parser");
+const bodyParser = require('body-parser');
 const multer = require("multer");
 require("dotenv").config();
 require("./passport-setup");
+const axios = require('axios');
 const MongoStore = require("connect-mongo");
 const User = require("./user-model");
 mongoose.connect("mongodb://localhost:27017/twitterbanner");
@@ -18,7 +20,6 @@ const { createBullBoard } = require("@bull-board/api");
 const { BullAdapter } = require("@bull-board/api/bullAdapter");
 const { ExpressAdapter } = require("@bull-board/express");
 const TwitterClient = require('twitter-api-client').TwitterClient;
-console.log(typeof(TwitterClient))
 const bannerChangeAPICallsQueue = new Queue("bannerChangeAPICallsQueue", process.env.REDIS_URL);
 bannerChangeAPICallsQueue.on("error", (err) => console.log(err));
 
@@ -34,47 +35,17 @@ const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
 
 bannerChangeAPICallsQueue.process('/Users/satpreetmakhija/Documents/startups/twitter-banner-changer/backend/processor.js');
 
-
-/**
- * Event listener for the queue...
- * When a job gets completed, we add the next one with the delay value as a paramter.
- */
-// someQueue.on('completed', function(job, result){
-//     console.log("The job got completed.")
-//     console.log(job);
-//     console.log(result);
-// }) 
-
-// bannerChangeAPICallsQueue.on('completed', function(job, result) {
-//     /**
-//      * Fetch the frequency of update section in the User database from the album
-//      * actually, we don't need the currentTime. Just get the frequency of update section.
-//      * and add a delay accordingly. 
-//      * Example. Say, frequency is 15 minutes.
-//      * delay = 1000 * 60 * 15 
-//      * for bannerURLsCounter value check if you have reached the end of the array. If yes, set the 
-//      * bannerURLsCounter to 0. 
-//      *  */ 
-//     console.log("Inside Completed Event");
-//     console.log("The userId is ");
-//     console.log(job.data.userId);
-//     console.log("The result is ")
-//     console.log(result);
-
-
-
-//     const delayTime = result.frequency * 1000 * 10 
-//     bannerChangeAPICallsQueue.add({userId: job.data.userId, bannersURLsCounter: result.bannersURLsCounter}, {delay: delayTime});
-    
-      /**
-       * 
-       * the only thing passed as the result will be the frequency conuter. bannersURLsCounter (that too maybe we can keep it in the album object itself)
-      * userId = job.data.userId, job.data.albumId, for now we pass the delay as well. 
-      */
-
-
-// })
-
+bannerChangeAPICallsQueue.on('completed', function(job, result) {
+  /**
+   * Fetch frequency of update from user database. 
+   * Use this value to add the next job in queue. 
+   * 
+   * 
+   */
+  console.log("on complete event trigerred")
+  const delayTime = 1000*5 //1 minute
+  bannerChangeAPICallsQueue.add({userId: job.data.userId, bannersURLsCounter: result.bannersURLsCounter, albumId: job.data.albumId}, {delay: delayTime});
+}) 
 
 
 
@@ -94,7 +65,7 @@ const app = express();
 
 app.use(express.static(__dirname + '/uploads'));
 app.use("/admin/queues", serverAdapter.getRouter());
-
+app.use(bodyParser.json());
 /**
  * Initialize session using the express-session library. Later, we'll set
  * the store value as well to save the session in our database.
@@ -138,7 +109,6 @@ app.get("/*", function (req, res, next) {
 });
 
 const authCheck = (req, res, next) => {
-  console.log("auth check was called..", req.user);
   if (!req.user) {
     res.json({
       authentication: false,
@@ -167,33 +137,22 @@ app.get("/logout", authCheck, (req, res, next) => {
   });
 });
 
-app.get("/test", (req, res, next) => {
-  //    User.findById()
-  console.log("testing");
-  console.log(req.user);
-  res.send({ name: "Satpreet" });
-});
-
-app.get("/privileged-route", authCheck, (req, res, next) => {
-  res.send("<h1>This is the privilege route</h1>");
-});
 
 app.post(
   "/create-album",
   authCheck,
   upload.array("banners"),
   (req, res, next) => {
-    console.log("Create Album was called. ");
-    console.log(req.body.albumname);
-    console.log(req.files[0].path);
     const bannersURLs = req.files.map((file) => {
-      return file.path;
+      //slice to remove substring prefix 'uploads/' 
+      return file.path.slice(8);
+      
     });
     const album = {
       albumName: req.body.albumname,
       createdOn: new Date(),
       bannersURLs: bannersURLs,
-      frequencyOfUpdateInHours: req.body.frequency,
+      frequencyOfUpdateInHours: null
     };
     
 
@@ -202,9 +161,10 @@ app.post(
       { $push: { albums: album } },
       function (error, success) {
         if (error) {
-          console.log(error);
+          res.status(500);
+          res.send({message: "An error occured while creating the album"});
         } else {
-          console.log(success);
+          res.send({message: "Album created successfully"});
         }
       }
     );
@@ -212,29 +172,48 @@ app.post(
       /**
        * Add the job producer code here...
        */
-    res.send("File received");
   }
 );
 
-app.post("/set-album", async (req, res, next) => {
+app.post("/set-album", authCheck, async (req, res, next) => {
    
-    // console.log(req.user);
-    /**
-     * pass albumName/id as a parameter. 
-     * find the album from the user collection.
-     * Set the attribute current_album_id to the album_id you get in the req object. 
-     * 
-     * 
-     * 
-     * To make this call we need the following data of the user.
-     * AccessToken, TokenSecret, bannersURLsCounter = 0,   
-     */
-    const userId = "6381aec9c99e41ffca669a4d"
+    const userId = req.user._id;
     const bannersURLsCounter = 0;
-    const albumId = "63835fcee310d04eee93326c";
-    bannerChangeAPICallsQueue.add({userId: userId, bannersURLsCounter: bannersURLsCounter, albumId: albumId});
-    
-    res.send({"message": "Album set."});
+    const albumId = req.body.albumId;
+    const bannerUpdateFrequency = req.body.bannerUpdateFrequency;
+
+    //Find album in Users collection and set the frequencyOfUpdateInHours key's value to bannerUpdateFrequency obtained in req.body
+    //Set user.currentAlbumIn Rotation to albumId; 
+    //Add the album to the API Calls queue. 
+
+    User.findById(userId, async function(err, user) {
+      if (err) {
+        next(err);
+      } else {
+        user.albums.find(album => album._id.toString() === albumId).frequencyOfUpdateInHours = Number(bannerUpdateFrequency);
+        user.currentAlbumInRotation = String(albumId);
+        await user.save();
+        bannerChangeAPICallsQueue.add({userId: userId, bannersURLsCounter: bannersURLsCounter, albumId: albumId}).then(() => 
+        res.send({"message": "Album set."}));
+        
+      }
+    })    
+
+
+    /**
+     * 
+     * This API call to change the banner works. KEEP THIS AS REFERENCE POINT
+     */
+    // const getConfigForTwitterAPICall = require('./createConfigForBannerChangeRequest');
+    // const path = require("path");
+    // let baseURL = "https://api.twitter.com/1.1/account/update_profile_banner.json";
+    // const bannerImgPath =
+    //   path.resolve(__dirname) + '/uploads/' +  "2022-12-06T12:32:11.492ZScreenshot 2022-12-06 at 1.40.18 PM.png"
+    //   const accessToken = "1423630007310553093-NInp9RLjwty1qTOPPHjEAUZkZxQWdN";
+    //   const tokenSecret = "dqZQGlNRWUyhFCwncxKbhzMndfhVlPCVIWHHDKHSK4Hsi";
+    // let config = getConfigForTwitterAPICall(process.env.TWITTER_CONSUMER_KEY, process.env.TWITTER_CONSUMER_SECRET, accessToken, tokenSecret, "POST", bannerImgPath, baseURL);
+    // let response = await axios(config);
+    // console.log(response);
 })
 
 app.get('/album/:albumid', authCheck, (req, res, next) => {
@@ -257,8 +236,6 @@ app.get('/album/:albumid', authCheck, (req, res, next) => {
 app.get("/auth/twitter", passport.authenticate("twitter"));
 
 app.get("/login/success", (req, res, next) => {
-  console.log("Here are the cookies...");
-  console.log(req.cookies);
   if (req.user) {
     let user = {
       name: req.user.name,
@@ -292,12 +269,6 @@ app.get(
   })
 );
 
-app.get("/image", (req, res, next) => {
-  console.log("sending file...");
-  res.sendFile(
-    "/Users/satpreetmakhija/Documents/startups/twitter-banner-changer/backend/uploads/x"
-  );
-});
 
 app.use((error, req, res, next) => {
   console.log(error);
