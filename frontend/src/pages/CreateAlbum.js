@@ -1,93 +1,114 @@
-import React from "react";
+import React, {useRef} from "react";
 import { Form, Col, Row, Card, Button } from "react-bootstrap";
-import {useState} from "react";
+import { useState } from "react";
 import axios from "axios";
-import {Toast} from "react-bootstrap";
+import { Toast } from "react-bootstrap";
 axios.defaults.withCredentials = true;
 function CreateAlbum() {
+  const [formValues, setFormValues] = useState({ albumName: "", banners: [] });
+  const [showToast, setShowToast] = useState(false);
 
-   
-    const [formValues, setFormValues] = useState({albumName: "", banners: []});
-    const [showToast, setShowToast] = useState(false);
-
-    const handleSubmit = (event) => {
-      event.preventDefault();
-        console.log(formValues);
-        let data = new FormData();
-        data.append("albumname", formValues.albumName);
-        // data.append("banners", formValues.banners);
-        for (var x = 0 ; x < formValues.banners.length; x++) {
-          data.append(`banners`, formValues.banners[x]);
-        }
-        const config = {
-          headers: {'content-type': 'multipart/form-data'}
-        }
-        // axios.post("http://localhost:8000/create-album", data).then((res) => console.log(res));
-
-        async function makePost() {
-          try {
-            const response = await axios.post("http://localhost:8000/create-album", data);
-            if (response.status === 200) {
-              //sandwitch saying album created and redirect to homepage. 
-              setShowToast(true);
-            } else {
-              //Error while creating request show sandwitch with an error..
-            }
-          } catch(err) {
-            console.log(err);
-          }
-        }
-        makePost();
-
-        /**
-         * Use the for loop below to console.log the key-value pairs stored in FormData. 
-         * A simple console.log on FormData without the given kind of for loop does not 
-         * give the result in the console.
-         */
-        // for (var pair of data.entries()) {
-        //   console.log(pair[0] + ',' + pair[1]);
-        // }
-
-
-        //do validation check. According to that return a message on the screen. 
-        setFormValues({albumName: "", banners: []})
-        
-        // event.target.reset();
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    let data = new FormData();
+    data.append("albumname", formValues.albumName);
+    for (var x = 0; x < formValues.banners.length; x++) {
+      data.append(`banners`, formValues.banners[x]);
     }
-
-    const handleTextChange = (e) => {
-        let value = e.target.value
-        setFormValues({...formValues, [e.target.name]: value});
-    }
-
-    const handleFileChange = (e) => {
-        let numberOfFiles = e.target.files.length;
-        const files = [];
-        for (let i = 0 ; i < numberOfFiles; i++) {
-          files.push(e.target.files[i]);
+    const config = {
+      headers: { "content-type": "multipart/form-data" },
+    };
+  
+    async function makePost() {
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/create-album",
+          data
+        );
+        if (response.status == '200') {
+          //sandwitch saying album created and redirect to homepage.
+          console.log(response.status);
+          setShowToast(true);
+        } else {
+          //Error while creating request show sandwitch with an error..
+          console.log("Error occured")
+          console.log(response.status);
         }
-        console.log(files);
-        setFormValues({...formValues, [e.target.name]:files});
+      } catch (err) {
+        console.log(err);
+      }
     }
+    makePost();
+
+    /**
+     * Use the for loop below to console.log the key-value pairs stored in FormData.
+     * A simple console.log on FormData without the given kind of for loop does not
+     * give the result in the console.
+     */
+    // for (var pair of data.entries()) {
+    //   console.log(pair[0] + ',' + pair[1]);
+    // }
+
+    //do validation check. According to that return a message on the screen.
+    setFormValues({ albumName: "", banners: [] });
+    fileInput.current.value = '';
+
+    // event.target.reset();
+  };
+
+  const fileInput = useRef(null);
+
+  const handleTextChange = (e) => {
+    let value = e.target.value;
+    setFormValues({ ...formValues, [e.target.name]: value });
+  };
+
+  const handleFileChange = (e) => {
+    let numberOfFiles = e.target.files.length;
+    const files = [];
+    for (let i = 0; i < numberOfFiles; i++) {
+      files.push(e.target.files[i]);
+    }
+    console.log(files);
+    setFormValues({ ...formValues, [e.target.name]: files });
+  };
 
   return (
     <div>
-      <Card style={{margin: "200px"}}>
+      <Card style={{ margin: "200px" }}>
+        <Form style={{ margin: "20px" }} onSubmit={handleSubmit}>
+          <Form.Control
+            size="lg"
+            type="text"
+            placeholder="Name your album"
+            value={formValues.albumName}
+            name="albumName"
+            onChange={handleTextChange}
+            required
+          />
 
-        <Form style={{margin: "20px"}} onSubmit={handleSubmit}>
-
-            <Form.Control size="lg" type="text" placeholder="Name your album"  value={formValues.albumName} name="albumName" onChange={handleTextChange} />
-          
-              <Form.Group controlId="formFileMultiple" className="mb-3" >
-                <Form.Label>Multiple files input example</Form.Label>
-                <Form.Control type="file" multiple onChange={handleFileChange} name="banners" />
-              </Form.Group>
-                <Button variant="primary" type="submit">
-                    Submit
-                </Button>
+          <Form.Group controlId="formFileMultiple" className="mb-3">
+            <Form.Label>Multiple files input example</Form.Label>
+            <Form.Control
+              type="file"
+              multiple
+              onChange={handleFileChange}
+              name="banners"
+              required
+              ref={fileInput}
+            />
+          </Form.Group>
+          <Button variant="primary" type="submit">
+            Submit
+          </Button>
         </Form>
       </Card>
-      <Toast show={showToast} onClose={() => setShowToast(false)} delay={5000} autohide>
+      <Toast
+        show={showToast}
+        onClose={() => setShowToast(false)}
+        delay={5000}
+        autohide
+      >
         <Toast.Header>
           <strong>Album created</strong>
         </Toast.Header>
