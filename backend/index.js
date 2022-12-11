@@ -272,6 +272,7 @@ app.get('/album/:albumid', authCheck, (req, res, next) => {
       if (album) {
         res.send({album: album});
       } else {
+        res.status(404);
         res.send({message: "You don't have an album with this id"});
       }
      
