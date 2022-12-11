@@ -43,8 +43,8 @@ bannerChangeAPICallsQueue.on('completed', function(job, result) {
    * 
    */
   console.log("on complete event trigerred")
-  const delayTime = 1000*5 //1 minute
-  bannerChangeAPICallsQueue.add({userId: job.data.userId, bannersURLsCounter: result.bannersURLsCounter, albumId: job.data.albumId}, {delay: delayTime});
+  // const delayTime = 1000*5 //1 minute
+  // bannerChangeAPICallsQueue.add({userId: job.data.userId, bannersURLsCounter: result.bannersURLsCounter, albumId: job.data.albumId}, {delay: delayTime});
 }) 
 
 

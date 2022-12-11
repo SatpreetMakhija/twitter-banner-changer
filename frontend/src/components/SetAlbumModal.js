@@ -4,14 +4,15 @@ import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-function SetBannerUpdateFrequencyModal(props) {
+function SetAlbumModal(props) {
+
+    let setShowSetAlbumToast = props.setShowSetAlbumToast;
   const url_parameters = useParams();
   const album_id = url_parameters.albumid;
 
-  const [show, setShow] = useState(false);
   const [bannerUpdateFrequency, setBannerUpdateFrequency] = useState(null);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handleClose = () => props.setShowSetAlbumModal(false);
+  const handleShow = () => props.setShowSetAlbumModal(true);
 
   const handleValueChange = (e) => {
     setBannerUpdateFrequency(e.target.value);
@@ -45,7 +46,7 @@ function SetBannerUpdateFrequencyModal(props) {
     if (response.status === "200") {
       //show sandwich with success notification
       handleClose();
-      props.setShowToast();
+      setShowSetAlbumToast(true);
     } else {
       //show sandwich with error notification.
       console.log("An error occured");
@@ -53,12 +54,9 @@ function SetBannerUpdateFrequencyModal(props) {
   };
   return (
     <>
-      <Button variant="primary" onClick={handleShow}>
-        Launch static backdrop modal
-      </Button>
 
       <Modal
-        show={show}
+        show={props.showAlbumModal}
         onHide={handleClose}
         backdrop="static"
         keyboard={false}
@@ -92,4 +90,4 @@ function SetBannerUpdateFrequencyModal(props) {
   );
 }
 
-export default SetBannerUpdateFrequencyModal;
+export default SetAlbumModal;
