@@ -1,4 +1,5 @@
 const express = require("express");
+const fs = require('fs');
 const passport = require("passport");
 const cors = require("cors");
 const session = require("express-session");
@@ -175,6 +176,51 @@ app.post(
   }
 );
 
+
+app.delete("/delete-album", authCheck, (req, res, next) => {
+  const albumId = req.body.albumId;
+  //find the album with this id, if doesn't exist show you don't have an album with this id.
+  // first delete images with the given url of the body. 
+  // delete the album from the user's album and send the respnse. 
+  const userId = req.user._id;
+  User.findById(userId, async function(err, user) {
+    if (err) {
+      res.status(404);
+      res.json({message: "Error. Could not find the user"});
+    } else {
+      const album = user.albums.find(album => album._id.toString() === albumId);
+      if (album) {
+        //for each bannersURLs, call fs.unlink.
+        for (let i = 0 ; i < album.bannersURLs.length ; i++) {
+          
+          fs.unlink(process.cwd() + '/uploads/' + album.bannersURLs[i], (err) => {
+            if (err) {
+              console.log("Error occured.");
+            }
+          })
+        }
+
+        //remove the album from the user model.
+        User.findOneAndUpdate({_id : userId},
+          {$pull: {albums: {_id : albumId}}},
+          function(error, success) {
+            if (error) {
+              res.status(404);
+              res.json({message: "An error occured."});
+            } else {
+              res.status(200);
+              res.send({messsage: "Album deleted successfully"});
+            }
+          })
+      } else {
+        res.status(404);
+        res.json({message: "User does not have an album with this id."});
+      }
+    }
+  })
+})
+
+
 app.post("/set-album", authCheck, async (req, res, next) => {
    
     const userId = req.user._id;
@@ -268,6 +314,7 @@ app.get(
     failureRedirect: "/login-fail",
   })
 );
+
 
 
 app.use((error, req, res, next) => {

@@ -4,13 +4,13 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 
-function SetAlbumToast (props) {
+function DeleteAlbumToast (props) {
 
     let showToast = props.toastData.showToast;
     let toastStatus = props.toastData.toastStatus;
-    let setShowToast = props.setAlbumToastData;
+    let setShowToast = props.setToastData;
     
-    let toastBodyContent = (toastStatus === '200' ? "Album Set" : "Error occured, try again.")
+    let toastBodyContent = (toastStatus === '200' ? "Album deleted" : "Error occured, try again.")
     return (
         <Row>
       <Col xs={6}>
@@ -25,4 +25,4 @@ function SetAlbumToast (props) {
     </Row>)
 };
 
-export default SetAlbumToast;
+export default DeleteAlbumToast;

@@ -6,13 +6,13 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 function SetAlbumModal(props) {
 
-    let setShowSetAlbumToast = props.setShowSetAlbumToast;
+    let setToastData = props.setAlbumToastData;
   const url_parameters = useParams();
   const album_id = url_parameters.albumid;
 
   const [bannerUpdateFrequency, setBannerUpdateFrequency] = useState(null);
-  const handleClose = () => props.setShowSetAlbumModal(false);
-  const handleShow = () => props.setShowSetAlbumModal(true);
+  const handleClose = () => props.setShowAlbumModal(false);
+  const handleShow = () => props.setShowAlbumModal(true);
 
   const handleValueChange = (e) => {
     setBannerUpdateFrequency(e.target.value);
@@ -46,10 +46,11 @@ function SetAlbumModal(props) {
     if (response.status === "200") {
       //show sandwich with success notification
       handleClose();
-      setShowSetAlbumToast(true);
+      setToastData({showToast: true, toastStatus: '200'});
     } else {
       //show sandwich with error notification.
-      console.log("An error occured");
+      handleClose();
+      setToastData({showToast: false, toastStatus: response.status});
     }
   };
   return (
