@@ -2,7 +2,7 @@ import React from "react";
 import Toast from "react-bootstrap/Toast";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-
+import { ToastContainer } from "react-bootstrap";
 
 function DeleteAlbumToast (props) {
 
@@ -14,6 +14,7 @@ function DeleteAlbumToast (props) {
     return (
         <Row>
       <Col xs={6}>
+        <ToastContainer position="top-end">
         <Toast onClose={() => setShowToast({showToast: false})} show={showToast} delay={5000} autohide >
           <Toast.Header>
             <strong className="me-auto">Update</strong>
@@ -21,6 +22,7 @@ function DeleteAlbumToast (props) {
           </Toast.Header>
           <Toast.Body>{toastBodyContent}</Toast.Body>
         </Toast>
+        </ToastContainer>
       </Col>
     </Row>)
 };
