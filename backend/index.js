@@ -16,39 +16,39 @@ mongoose.connect("mongodb://localhost:27017/twitterbanner");
 
 const CLIENT_HOMEPAGE_URL = "http://localhost:3000";
 
-const Queue = require("bull");
-const { createBullBoard } = require("@bull-board/api");
-const { BullAdapter } = require("@bull-board/api/bullAdapter");
-const { ExpressAdapter } = require("@bull-board/express");
-const TwitterClient = require("twitter-api-client").TwitterClient;
-const bannerChangeAPICallsQueue = new Queue(
-  "bannerChangeAPICallsQueue",
-  process.env.REDIS_URL
-);
-bannerChangeAPICallsQueue.on("error", (err) => console.log(err));
+// const Queue = require("bull");
+// const { createBullBoard } = require("@bull-board/api");
+// const { BullAdapter } = require("@bull-board/api/bullAdapter");
+// const { ExpressAdapter } = require("@bull-board/express");
+// const TwitterClient = require("twitter-api-client").TwitterClient;
+// const bannerChangeAPICallsQueue = new Queue(
+//   "bannerChangeAPICallsQueue",
+//   process.env.REDIS_URL
+// );
+// bannerChangeAPICallsQueue.on("error", (err) => console.log(err));
 
-const serverAdapter = new ExpressAdapter();
-serverAdapter.setBasePath("/admin/queues");
-const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
-  queues: [new BullAdapter(bannerChangeAPICallsQueue)],
-  serverAdapter: serverAdapter,
-});
+// const serverAdapter = new ExpressAdapter();
+// serverAdapter.setBasePath("/admin/queues");
+// const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
+//   queues: [new BullAdapter(bannerChangeAPICallsQueue)],
+//   serverAdapter: serverAdapter,
+// });
 
-bannerChangeAPICallsQueue.process(
-  "/Users/satpreetmakhija/Documents/startups/twitter-banner-changer/backend/processor.js"
-);
+// bannerChangeAPICallsQueue.process(
+//   "/Users/satpreetmakhija/Documents/startups/twitter-banner-changer/backend/processor.js"
+// );
 
-bannerChangeAPICallsQueue.on("completed", function (job, result) {
-  /**
-   * Fetch frequency of update from user database.
-   * Use this value to add the next job in queue.
-   *
-   *
-   */
-  console.log("on complete event trigerred");
-  // const delayTime = 1000*5 //1 minute
-  // bannerChangeAPICallsQueue.add({userId: job.data.userId, bannersURLsCounter: result.bannersURLsCounter, albumId: job.data.albumId}, {delay: delayTime});
-});
+// bannerChangeAPICallsQueue.on("completed", function (job, result) {
+//   /**
+//    * Fetch frequency of update from user database.
+//    * Use this value to add the next job in queue.
+//    *
+//    *
+//    */
+//   console.log("on complete event trigerred");
+//   // const delayTime = 1000*5 //1 minute
+//   // bannerChangeAPICallsQueue.add({userId: job.data.userId, bannersURLsCounter: result.bannersURLsCounter, albumId: job.data.albumId}, {delay: delayTime});
+// });
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -248,24 +248,24 @@ app.post("/set-album", authCheck, async (req, res, next) => {
   //Set user.currentAlbumIn Rotation to albumId;
   //Add the album to the API Calls queue.
 
-  User.findById(userId, async function (err, user) {
-    if (err) {
-      next(err);
-    } else {
-      user.albums.find(
-        (album) => album._id.toString() === albumId
-      ).frequencyOfUpdateInHours = Number(bannerUpdateFrequency);
-      user.currentAlbumInRotation = String(albumId);
-      await user.save();
-      bannerChangeAPICallsQueue
-        .add({
-          userId: userId,
-          bannersURLsCounter: bannersURLsCounter,
-          albumId: albumId,
-        })
-        .then(() => res.send({ message: "Album set." }));
-    }
-  });
+  // User.findById(userId, async function (err, user) {
+  //   if (err) {
+  //     next(err);
+  //   } else {
+  //     user.albums.find(
+  //       (album) => album._id.toString() === albumId
+  //     ).frequencyOfUpdateInHours = Number(bannerUpdateFrequency);
+  //     user.currentAlbumInRotation = String(albumId);
+  //     await user.save();
+  //     bannerChangeAPICallsQueue
+  //       .add({
+  //         userId: userId,
+  //         bannersURLsCounter: bannersURLsCounter,
+  //         albumId: albumId,
+  //       })
+  //       .then(() => res.send({ message: "Album set." }));
+  //   }
+  // });
 
   /**
    *
