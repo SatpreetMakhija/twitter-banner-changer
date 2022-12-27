@@ -1,7 +1,9 @@
 .App {
   text-align: center;
-  margin-top: 300px;
+  padding-top: 30vh;
+  padding-bottom: 60vh;
   font-size: x-large;
+  background-image: url('./media/social-media-background-twitte.jpg');
 }
 
 .App-logo {

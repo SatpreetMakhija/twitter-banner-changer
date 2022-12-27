@@ -58,8 +58,8 @@ function Home() {
   }
 
 
-    const DefaultHomeContent = () => <div className="App"> Dynamically change your twitter profile's banner <br/>
-  <button onClick={setLoginStatus}>Sign in with Twitter</button></div>
+    const DefaultHomeContent = () => <div className="App" > <h1>Dynamically change your twitter profile's banner </h1><br/>
+  <Button onClick={setLoginStatus} size='lg' variant='primary'>Sign in with Twitter</Button></div>
 
 
 

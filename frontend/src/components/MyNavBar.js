@@ -2,7 +2,7 @@ import React from "react";
 import {Container, Navbar, Button, Image} from 'react-bootstrap';
 import useStore from "../Store";
 import axios from "axios";
-
+import './MyNavBar.css'
 function MyNavBar () {
 
 
@@ -29,9 +29,9 @@ function MyNavBar () {
 
     return (
         <React.Fragment>
-        <Navbar>
+        <Navbar className='color-nav' variant='light' expand='lg' style={{height:"10vh"}}  >
         <Container>
-          <Navbar.Brand href="/">Twitter Banner Changer</Navbar.Brand>
+          <Navbar.Brand href="/"><h2>Twitter Banner Changer</h2></Navbar.Brand>
           <Navbar.Toggle />
           <Navbar.Collapse className="justify-content-end">
             <Navbar.Text>
