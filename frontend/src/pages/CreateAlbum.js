@@ -2,7 +2,7 @@ import React, {useRef} from "react";
 import { Form, Col, Row, Card, Button } from "react-bootstrap";
 import { useState } from "react";
 import axios from "axios";
-import { Toast } from "react-bootstrap";
+import { Toast, ToastContainer } from "react-bootstrap";
 axios.defaults.withCredentials = true;
 function CreateAlbum() {
   const [formValues, setFormValues] = useState({ albumName: "", banners: [] });
@@ -75,7 +75,7 @@ function CreateAlbum() {
 
   return (
     <div>
-      <Card style={{ margin: "200px" }}>
+      <Card style={{ padding: "300px" }}>
         <Form style={{ margin: "20px" }} onSubmit={handleSubmit}>
           <Form.Control
             size="lg"
@@ -102,7 +102,7 @@ function CreateAlbum() {
             Submit
           </Button>
         </Form>
-      </Card>
+        <ToastContainer position="top-end">
       <Toast
         show={showToast}
         onClose={() => setShowToast(false)}
@@ -114,6 +114,9 @@ function CreateAlbum() {
         </Toast.Header>
         <Toast.Body>Your album was created successfully!</Toast.Body>
       </Toast>
+      </ToastContainer>
+      </Card>
+      
     </div>
   );
 }
