@@ -1,4 +1,5 @@
 const express = require("express");
+const Agenda = require('agenda');
 const fs = require("fs");
 const passport = require("passport");
 const cors = require("cors");
@@ -12,43 +13,64 @@ require("./passport-setup");
 const axios = require("axios");
 const MongoStore = require("connect-mongo");
 const User = require("./user-model");
-mongoose.connect("mongodb://localhost:27017/twitterbanner");
+mongoose.connect(process.env.MONGODB_URL);
 
 const CLIENT_HOMEPAGE_URL = "http://localhost:3000";
 
-// const Queue = require("bull");
-// const { createBullBoard } = require("@bull-board/api");
-// const { BullAdapter } = require("@bull-board/api/bullAdapter");
-// const { ExpressAdapter } = require("@bull-board/express");
-// const TwitterClient = require("twitter-api-client").TwitterClient;
-// const bannerChangeAPICallsQueue = new Queue(
-//   "bannerChangeAPICallsQueue",
-//   process.env.REDIS_URL
-// );
-// bannerChangeAPICallsQueue.on("error", (err) => console.log(err));
 
-// const serverAdapter = new ExpressAdapter();
-// serverAdapter.setBasePath("/admin/queues");
-// const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
-//   queues: [new BullAdapter(bannerChangeAPICallsQueue)],
-//   serverAdapter: serverAdapter,
-// });
+const agenda = new Agenda({ db: { address: process.env.MONGODB_URL, collection: 'TwitterBannerChangeAPICallsQueue' }, processEvery: '5 seconds' });
 
-// bannerChangeAPICallsQueue.process(
-//   "/Users/satpreetmakhija/Documents/startups/twitter-banner-changer/backend/processor.js"
-// );
 
-// bannerChangeAPICallsQueue.on("completed", function (job, result) {
-//   /**
-//    * Fetch frequency of update from user database.
-//    * Use this value to add the next job in queue.
-//    *
-//    *
-//    */
-//   console.log("on complete event trigerred");
-//   // const delayTime = 1000*5 //1 minute
-//   // bannerChangeAPICallsQueue.add({userId: job.data.userId, bannersURLsCounter: result.bannersURLsCounter, albumId: job.data.albumId}, {delay: delayTime});
-// });
+
+
+const changeBannerProcessor = require('./changeBannerProcessor');
+agenda.define('change twitter banner', changeBannerProcessor);
+agenda.on('success:change twitter banner', job => {
+  const albumId = job.attrs.data.albumId;
+  const userId = job.attrs.data.userId;
+  const bannersURLsCounterAtPrevJob = job.attrs.data.bannersURLsCounter;
+  const user = User.findById(userId).exec();
+  user.then((user => {
+  const album = user.albums.find((album) => album._id.toString() === albumId);
+  /**
+   * Set bannersURLsCounter to 0 if reached end of album array. 
+   */
+  if (bannersURLsCounterAtPrevJob < album.bannersURLs.length - 1) {
+    // add job with increase in counter
+    
+    agenda.schedule(`${album.frequencyOfUpdateInHours.toString()} hour`,'change twitter banner', {userId: userId, albumId: albumId, bannersURLsCounter: bannersURLsCounterAtPrevJob + 1});
+  } else {
+    //add job with counter set to 0.
+    agenda.schedule(`${album.frequencyOfUpdateInHours.toString()} hour`,'change twitter banner', {userId: userId, albumId: albumId, bannersURLsCounter: 0});
+  }
+  })) 
+  job.remove();
+})
+
+agenda.on('fail:change twitter banner', (err, job) => {
+  //save error at some place for further analysis. But, still move to the next albumURL.
+  //TODO Save error at some database. 
+  const albumId = job.attrs.data.albumId;
+  const userId = job.attrs.data.userId;
+  const bannersURLsCounterAtPrevJob = job.attrs.data.bannersURLsCounter;
+  const user = User.findById(userId).exec();
+  user.then((user => {
+  const album = user.albums.find((album) => album._id.toString() === albumId);
+  /**
+   * Set bannersURLsCounter to 0 if reached end of album array. 
+   */
+  if (bannersURLsCounterAtPrevJob < album.bannersURLs.length - 1) {
+    // add job with increase in counter
+    
+    agenda.schedule(`${album.frequencyOfUpdateInHours.toString()} hour`,'change twitter banner', {userId: userId, albumId: albumId, bannersURLsCounter: bannersURLsCounterAtPrevJob + 1});
+  } else {
+    //add job with counter set to 0.
+    agenda.schedule(`${album.frequencyOfUpdateInHours.toString()} hour`,'change twitter banner', {userId: userId, albumId: albumId, bannersURLsCounter: 0});
+  }
+  })) 
+  job.remove();
+})
+
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -81,7 +103,8 @@ const upload = multer({
 const app = express();
 
 app.use(express.static(__dirname + "/uploads"));
-app.use("/admin/queues", serverAdapter.getRouter());
+// app.use("/admin/queues", serverAdapter.getRouter());
+
 app.use(bodyParser.json());
 /**
  * Initialize session using the express-session library. Later, we'll set
@@ -244,28 +267,29 @@ app.post("/set-album", authCheck, async (req, res, next) => {
   const albumId = req.body.albumId;
   const bannerUpdateFrequency = req.body.bannerUpdateFrequency;
 
-  //Find album in Users collection and set the frequencyOfUpdateInHours key's value to bannerUpdateFrequency obtained in req.body
-  //Set user.currentAlbumIn Rotation to albumId;
-  //Add the album to the API Calls queue.
+  // Find album in Users collection and set the frequencyOfUpdateInHours key's value to bannerUpdateFrequency obtained in req.body
+  // Set user.currentAlbumIn Rotation to albumId;
+  // Add the album to the API Calls queue.
 
-  // User.findById(userId, async function (err, user) {
-  //   if (err) {
-  //     next(err);
-  //   } else {
-  //     user.albums.find(
-  //       (album) => album._id.toString() === albumId
-  //     ).frequencyOfUpdateInHours = Number(bannerUpdateFrequency);
-  //     user.currentAlbumInRotation = String(albumId);
-  //     await user.save();
-  //     bannerChangeAPICallsQueue
-  //       .add({
-  //         userId: userId,
-  //         bannersURLsCounter: bannersURLsCounter,
-  //         albumId: albumId,
-  //       })
-  //       .then(() => res.send({ message: "Album set." }));
-  //   }
-  // });
+  User.findById(userId, async function (err, user) {
+    if (err) {
+      next(err);
+    } else {
+      user.albums.find(
+        (album) => album._id.toString() === albumId
+      ).frequencyOfUpdateInHours = Number(bannerUpdateFrequency);
+      user.currentAlbumInRotation = String(albumId);
+      await user.save();
+        agenda.start().then(() => {
+          agenda.now('change twitter banner', {userId: userId, albumId: albumId, bannersURLsCounter: 0});
+          res.send({message: "Album Set."});
+        })
+        .catch((err) => {
+          res.status(404);
+          res.send({message: "An error occured. Album could not be set. Try again."})
+        })
+    }
+  });
 
   /**
    *
