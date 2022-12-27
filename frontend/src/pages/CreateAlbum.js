@@ -27,8 +27,10 @@ function CreateAlbum() {
         );
         if (response.status == '200') {
           //sandwitch saying album created and redirect to homepage.
-          console.log(response.status);
           setShowToast(true);
+          setTimeout(() => {
+            window.location.href = "/"
+        }, 3000)
         } else {
           //Error while creating request show sandwitch with an error..
           console.log("Error occured")
