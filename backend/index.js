@@ -167,6 +167,24 @@ app.get("/", (req, res, next) => {
   }
 });
 
+const adminCheck = (req, res, next) => {
+
+  const isAdmin = req.user.isAdmin;
+  console.log(isAdmin);
+  if (isAdmin) {
+    next();
+  } else {
+    res.status("403");
+    res.json({message: "User is not admin."});
+  }
+}
+
+app.get("/admin", authCheck, adminCheck, (req, res, next) => {
+  res.json({message: "user is admin. "});
+})
+
+
+
 app.get("/logout", authCheck, (req, res, next) => {
   req.logout(function (err) {
     if (err) {

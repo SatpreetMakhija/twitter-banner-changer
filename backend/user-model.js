@@ -8,6 +8,7 @@ const userSchema = new Schema({
     accessToken: String,
     tokenSecret: String,
     currentAlbumInRotation: String,
+    isAdmin: {type: Boolean, default: false},
     albums: [{
         albumName: String,
         createdOn: Date,
