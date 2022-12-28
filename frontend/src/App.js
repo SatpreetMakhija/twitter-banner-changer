@@ -11,8 +11,9 @@ function App() {
   return (
     <div>
 
-      <MyNavBar/>
+      
         <BrowserRouter>
+        <MyNavBar/>
           <Routes>
             <Route path="/" exact element={<Home/>}/>
             <Route path = "/create-album" element={<CreateAlbum/>}/>
