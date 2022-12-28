@@ -14,7 +14,8 @@ module.exports = function (job) {
     const user = User.findById(userId).exec();
     user.then(async (user) => {
         const album = user.albums.find((album) => album._id.toString() === albumId);
-        const bannerImgPath =
+        if (album) {
+            const bannerImgPath =
         path.resolve(__dirname) + '/uploads/' +  album.bannersURLs[bannersURLsCounter];
         console.log(`Banner image path is ${bannerImgPath}`);
         let baseURL = "https://api.twitter.com/1.1/account/update_profile_banner.json"
@@ -27,6 +28,10 @@ module.exports = function (job) {
         } catch (err) {
             console.log(err);
         }
+        } else {
+            console.log("Such an album does not exist.");
+        }
+        
 
     //  /**
     //   * Check to set bannersURLsCounter to 0 if reached end of albums array.

@@ -315,7 +315,12 @@ app.get("/album/:albumid", authCheck, (req, res, next) => {
     } else {
       let album = user.albums.find((album) => album._id.toString() === albumId);
       if (album) {
-        res.send({ album: album });
+        if (albumId == user.currentAlbumInRotation) {
+          res.send({ album: album,  isCurrentAlbumInRotation: true});
+        } else {
+          res.send({album: album, isCurrentAlbumInRotation: false});
+        }
+        
       } else {
         res.status(404);
         res.send({ message: "You don't have an album with this id" });
