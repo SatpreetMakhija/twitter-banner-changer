@@ -19,6 +19,7 @@ function App() {
             <Route path= "/showimg" element = {<ShowImg/>}/>
             <Route path = "/album/:albumid" element={<ShowAlbum/>}/>
             <Route path = "/admin" element={<Admin/>}/>
+            <Route path="*" element={<Home/>}/>
           </Routes>
         </BrowserRouter>
       
