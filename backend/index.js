@@ -44,7 +44,7 @@ agenda.on('success:change twitter banner', job => {
     agenda.schedule(`${album.frequencyOfUpdateInHours.toString()} hour`,'change twitter banner', {userId: userId, albumId: albumId, bannersURLsCounter: 0});
   }
   })) 
-  job.remove();
+  console.log(job);
 })
 
 agenda.on('fail:change twitter banner', (err, job) => {
@@ -68,7 +68,6 @@ agenda.on('fail:change twitter banner', (err, job) => {
     agenda.schedule(`${album.frequencyOfUpdateInHours.toString()} hour`,'change twitter banner', {userId: userId, albumId: albumId, bannersURLsCounter: 0});
   }
   })) 
-  job.remove();
 })
 
 
