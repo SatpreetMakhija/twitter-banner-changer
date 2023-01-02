@@ -1,5 +1,5 @@
 const express = require("express");
-const Agenda = require('agenda');
+const Agenda = require("agenda");
 const fs = require("fs");
 const passport = require("passport");
 const cors = require("cors");
@@ -17,59 +17,85 @@ mongoose.connect(process.env.MONGODB_URL);
 
 const CLIENT_HOMEPAGE_URL = "http://localhost:3000";
 
+const agenda = new Agenda({
+  db: {
+    address: process.env.MONGODB_URL,
+    collection: "TwitterBannerChangeAPICallsQueue",
+  },
+  processEvery: "5 seconds",
+});
 
-const agenda = new Agenda({ db: { address: process.env.MONGODB_URL, collection: 'TwitterBannerChangeAPICallsQueue' }, processEvery: '5 seconds' });
-
-
-
-
-const changeBannerProcessor = require('./changeBannerProcessor');
-agenda.define('change twitter banner', changeBannerProcessor);
-agenda.on('success:change twitter banner', job => {
+const agendaJobName = "change twitter banner";
+const changeBannerProcessor = require("./changeBannerProcessor");
+agenda.define("change twitter banner", changeBannerProcessor);
+agenda.on("success:change twitter banner", (job) => {
   const albumId = job.attrs.data.albumId;
   const userId = job.attrs.data.userId;
   const bannersURLsCounterAtPrevJob = job.attrs.data.bannersURLsCounter;
   const user = User.findById(userId).exec();
-  user.then((user => {
-  const album = user.albums.find((album) => album._id.toString() === albumId);
-  /**
-   * Set bannersURLsCounter to 0 if reached end of album array. 
-   */
-  if (bannersURLsCounterAtPrevJob < album.bannersURLs.length - 1) {
-    // add job with increase in counter
-    
-    agenda.schedule(`${album.frequencyOfUpdateInHours.toString()} hour`,'change twitter banner', {userId: userId, albumId: albumId, bannersURLsCounter: bannersURLsCounterAtPrevJob + 1});
-  } else {
-    //add job with counter set to 0.
-    agenda.schedule(`${album.frequencyOfUpdateInHours.toString()} hour`,'change twitter banner', {userId: userId, albumId: albumId, bannersURLsCounter: 0});
-  }
-  })) 
+  user.then((user) => {
+    const album = user.albums.find((album) => album._id.toString() === albumId);
+    /**
+     * Set bannersURLsCounter to 0 if reached end of album array.
+     */
+    if (bannersURLsCounterAtPrevJob < album.bannersURLs.length - 1) {
+      // add job with increase in counter
+
+      agenda.schedule(
+        `${album.frequencyOfUpdateInHours.toString()} hour`,
+        "change twitter banner",
+        {
+          userId: userId,
+          albumId: albumId,
+          bannersURLsCounter: bannersURLsCounterAtPrevJob + 1,
+        }
+      );
+    } else {
+      //add job with counter set to 0.
+      agenda.schedule(
+        `${album.frequencyOfUpdateInHours.toString()} hour`,
+        "change twitter banner",
+        { userId: userId, albumId: albumId, bannersURLsCounter: 0 }
+      );
+    }
+  });
   console.log(job);
-})
+});
 
-agenda.on('fail:change twitter banner', (err, job) => {
+agenda.on("fail:change twitter banner", (err, job) => {
   //save error at some place for further analysis. But, still move to the next albumURL.
-  //TODO Save error at some database. 
+  //TODO Save error at some database.
   const albumId = job.attrs.data.albumId;
   const userId = job.attrs.data.userId;
   const bannersURLsCounterAtPrevJob = job.attrs.data.bannersURLsCounter;
   const user = User.findById(userId).exec();
-  user.then((user => {
-  const album = user.albums.find((album) => album._id.toString() === albumId);
-  /**
-   * Set bannersURLsCounter to 0 if reached end of album array. 
-   */
-  if (bannersURLsCounterAtPrevJob < album.bannersURLs.length - 1) {
-    // add job with increase in counter
-    
-    agenda.schedule(`${album.frequencyOfUpdateInHours.toString()} hour`,'change twitter banner', {userId: userId, albumId: albumId, bannersURLsCounter: bannersURLsCounterAtPrevJob + 1});
-  } else {
-    //add job with counter set to 0.
-    agenda.schedule(`${album.frequencyOfUpdateInHours.toString()} hour`,'change twitter banner', {userId: userId, albumId: albumId, bannersURLsCounter: 0});
-  }
-  })) 
-})
+  user.then((user) => {
+    const album = user.albums.find((album) => album._id.toString() === albumId);
+    /**
+     * Set bannersURLsCounter to 0 if reached end of album array.
+     */
+    if (bannersURLsCounterAtPrevJob < album.bannersURLs.length - 1) {
+      // add job with increase in counter
 
+      agenda.schedule(
+        `${album.frequencyOfUpdateInHours.toString()} hour`,
+        "change twitter banner",
+        {
+          userId: userId,
+          albumId: albumId,
+          bannersURLsCounter: bannersURLsCounterAtPrevJob + 1,
+        }
+      );
+    } else {
+      //add job with counter set to 0.
+      agenda.schedule(
+        `${album.frequencyOfUpdateInHours.toString()} hour`,
+        "change twitter banner",
+        { userId: userId, albumId: albumId, bannersURLsCounter: 0 }
+      );
+    }
+  });
+});
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -87,16 +113,16 @@ const upload = multer({
     fileSize: 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
-    console.log("fileFilter is called...")
-    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-   if (allowedTypes.includes(file.mimetype)) {
-    console.log("pass");
-    cb(null, true);
-   }else {
-    console.log("not pass")
-    cb("There exists a file that is not supported", false);
-   }
-  }
+    console.log("fileFilter is called...");
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
+    if (allowedTypes.includes(file.mimetype)) {
+      console.log("pass");
+      cb(null, true);
+    } else {
+      console.log("not pass");
+      cb("There exists a file that is not supported", false);
+    }
+  },
 });
 
 const app = express();
@@ -211,12 +237,23 @@ app.post(
   }
 );
 
-app.delete("/delete-album", authCheck, (req, res, next) => {
+app.delete("/delete-album", authCheck, async (req, res, next) => {
   const albumId = req.body.albumId;
   //find the album with this id, if doesn't exist show you don't have an album with this id.
   // first delete images with the given url of the body.
   // delete the album from the user's album and send the respnse.
   const userId = req.user._id;
+  const currentAlbumInRotation = req.user.currentAlbumInRotation;
+
+  if (currentAlbumInRotation && currentAlbumInRotation == albumId) {
+    //Remove the next API call from the queue.
+    const jobs = await agenda.jobs({ name: agendaJobName });
+    jobs.forEach((job) => {
+      if (job.attrs.data.albumId == albumId && job.attrs.lastRunAt == null) {
+        job.remove();
+      }
+    });
+  }
   User.findById(userId, async function (err, user) {
     if (err) {
       res.status(404);
@@ -279,14 +316,22 @@ app.post("/set-album", authCheck, async (req, res, next) => {
       ).frequencyOfUpdateInHours = Number(bannerUpdateFrequency);
       user.currentAlbumInRotation = String(albumId);
       await user.save();
-        agenda.start().then(() => {
-          agenda.now('change twitter banner', {userId: userId, albumId: albumId, bannersURLsCounter: 0});
-          res.send({message: "Album Set."});
+      agenda
+        .start()
+        .then(() => {
+          agenda.now("change twitter banner", {
+            userId: userId,
+            albumId: albumId,
+            bannersURLsCounter: 0,
+          });
+          res.send({ message: "Album Set." });
         })
         .catch((err) => {
           res.status(404);
-          res.send({message: "An error occured. Album could not be set. Try again."})
-        })
+          res.send({
+            message: "An error occured. Album could not be set. Try again.",
+          });
+        });
     }
   });
 
@@ -315,11 +360,10 @@ app.get("/album/:albumid", authCheck, (req, res, next) => {
       let album = user.albums.find((album) => album._id.toString() === albumId);
       if (album) {
         if (albumId == user.currentAlbumInRotation) {
-          res.send({ album: album,  isCurrentAlbumInRotation: true});
+          res.send({ album: album, isCurrentAlbumInRotation: true });
         } else {
-          res.send({album: album, isCurrentAlbumInRotation: false});
+          res.send({ album: album, isCurrentAlbumInRotation: false });
         }
-        
       } else {
         res.status(404);
         res.send({ message: "You don't have an album with this id" });
