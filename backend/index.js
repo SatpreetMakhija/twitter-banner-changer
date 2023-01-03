@@ -292,26 +292,6 @@ app.post("/set-album", authCheck, async (req, res, next) => {
   // console.log(response);
 });
 
-app.get("/album/:albumid", authCheck, (req, res, next) => {
-  const albumId = req.params.albumid;
-  User.findById(req.user._id, (err, user) => {
-    if (err) {
-      console.log("Could not find a user with this user id");
-    } else {
-      let album = user.albums.find((album) => album._id.toString() === albumId);
-      if (album) {
-        if (albumId == user.currentAlbumInRotation) {
-          res.send({ album: album, isCurrentAlbumInRotation: true });
-        } else {
-          res.send({ album: album, isCurrentAlbumInRotation: false });
-        }
-      } else {
-        res.status(404);
-        res.send({ message: "You don't have an album with this id" });
-      }
-    }
-  });
-});
 
 app.get("/auth/twitter", passport.authenticate("twitter"));
 
