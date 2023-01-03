@@ -1,6 +1,6 @@
 const {default: mongoose} = require('mongoose');
 const path = require('path');
-const User = require('./user-model');
+const User = require('./models/user-model');
 const getConfigForTwitterAPICall = require('./createConfigForBannerChangeRequest');
 const {default: axios} = require('axios');
 

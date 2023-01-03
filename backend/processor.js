@@ -3,7 +3,7 @@ const fs = require("fs");
 const util = require("util");
 const path = require("path");
 const MongoStore = require("connect-mongo");
-const User = require("./user-model");
+const User = require("./models/user-model");
 mongoose.connect("mongodb://localhost:27017/twitterbanner");
 const getConfigForTwitterAPICall = require('./createConfigForBannerChangeRequest');
 const { default: axios } = require("axios");

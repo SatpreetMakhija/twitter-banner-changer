@@ -7,14 +7,13 @@ const session = require("express-session");
 const { default: mongoose } = require("mongoose");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-const multer = require("multer");
 require("dotenv").config();
 require("./passport-setup");
 const axios = require("axios");
 const MongoStore = require("connect-mongo");
-const User = require("./user-model");
+const User = require("./models/user-model");
 mongoose.connect(process.env.MONGODB_URL);
-
+const albumsRouter = require('./routes/albums');
 const CLIENT_HOMEPAGE_URL = "http://localhost:3000";
 
 const agenda = new Agenda({
@@ -97,33 +96,6 @@ agenda.on("fail:change twitter banner", (err, job) => {
   });
 });
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./uploads");
-  },
-  filename: function (req, file, cb) {
-    cb(null, new Date().toISOString() + file.originalname);
-  },
-});
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    //in bytes (approx 1 MB)
-    fileSize: 1024 * 1024,
-  },
-  fileFilter: (req, file, cb) => {
-    console.log("fileFilter is called...");
-    const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
-    if (allowedTypes.includes(file.mimetype)) {
-      console.log("pass");
-      cb(null, true);
-    } else {
-      console.log("not pass");
-      cb("There exists a file that is not supported", false);
-    }
-  },
-});
 
 const app = express();
 
@@ -202,40 +174,9 @@ app.get("/logout", authCheck, (req, res, next) => {
   });
 });
 
-app.post(
-  "/create-album",
-  authCheck,
-  upload.array("banners"),
-  (req, res, next) => {
-    const bannersURLs = req.files.map((file) => {
-      //slice to remove substring prefix 'uploads/'
-      return file.path.slice(8);
-    });
-    const album = {
-      albumName: req.body.albumname,
-      createdOn: new Date(),
-      bannersURLs: bannersURLs,
-      frequencyOfUpdateInHours: null,
-    };
+app.use('/album', albumsRouter);
 
-    User.findOneAndUpdate(
-      { _id: req.user._id },
-      { $push: { albums: album } },
-      function (error, success) {
-        if (error) {
-          res.status(500);
-          res.send({ message: "An error occured while creating the album" });
-        } else {
-          res.send({ message: "Album created successfully" });
-        }
-      }
-    );
-    // next();
-    /**
-     * Add the job producer code here...
-     */
-  }
-);
+
 
 app.delete("/delete-album", authCheck, async (req, res, next) => {
   const albumId = req.body.albumId;

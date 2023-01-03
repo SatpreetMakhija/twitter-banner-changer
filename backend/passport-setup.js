@@ -1,6 +1,6 @@
 const passport = require('passport');
 const TwitterStrategy = require('passport-twitter').Strategy;
-const User = require('./user-model');
+const User = require('./models/user-model');
 /**
  * 
  * serializeUser() is used to persist user data (after successful auth) into a session so that user data is not
