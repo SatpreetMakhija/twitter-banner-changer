@@ -24,7 +24,7 @@ function SetAlbumModal(props) {
     //call api set-album
     try {
       let response = await axios.post(
-        "http://localhost:8000/set-album",
+        "http://localhost:8000/album/set-album",
         {
           albumId: album_id,
           bannerUpdateFrequency: bannerUpdateFrequency,
