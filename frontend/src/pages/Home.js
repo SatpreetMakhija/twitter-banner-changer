@@ -36,7 +36,21 @@ function Home() {
         
       }
       })
+
+      async function testError() {
+        try {
+          let response = await axios.get("http://localhost:8000/test-error");
+          console.log("resonpse got");
+        } catch(err) {
+          console.log("INside the catch block");
+          console.log(err.response.data);
+        }
+      }
+    
+      testError();
+
     }
+
 
     useEffect(checkUserLoginStatus, []);
 

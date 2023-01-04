@@ -18,28 +18,28 @@ function CreateAlbum() {
     const config = {
       headers: { "content-type": "multipart/form-data" },
     };
-  
+    
+
     async function makePost() {
       try {
-        const response = await axios.post(
-          "http://localhost:8000/album/create-album",
-          data
-        );
-        if (response.status == '200') {
-          //sandwitch saying album created and redirect to homepage.
-          setShowToast(true);
-          setTimeout(() => {
-            window.location.href = "/"
-        }, 3000)
-        } else {
-          //Error while creating request show sandwitch with an error..
-          console.log("Error occured")
-          console.log(response.status);
-        }
+        const response = await axios.post("http://localhost:8000/album/create-album", data);
+        setShowToast(true);
+        setTimeout(() => {
+          window.location.href = "/"
+        }, 3000);
       } catch (err) {
-        console.log(err);
+          if (err.response.data.errorCode == "LIMIT_FILE_SIZE") {
+            console.log("Show error toast with file size warning");
+          } else if (err.response.data.errorCode == "FILE_TYPE_NOT_SUPPORTED") {
+            console.log("Show error toast with file type warning");
+          } else if (err.response.data.errorCode == "LIMIT_FILE_COUNT") {
+            console.log("Show error toast with #files limit warning");
+          } else {
+            console.log("An unexpected error occured. Give a generic error toast to try again");
+          }
       }
     }
+
     makePost();
 
     /**
