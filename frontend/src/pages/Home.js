@@ -19,7 +19,7 @@ function Home() {
 
     const checkUserLoginStatus = () => {
       console.log("inside useffect");
-      axios.get("http://localhost:8000/login/success", {withCredentials: true}).then((response) =>{
+      axios.get("http://localhost:8000/auth/login/success", {withCredentials: true}).then((response) =>{
 
       if (response.status === 404) {
         console.log("No user found")

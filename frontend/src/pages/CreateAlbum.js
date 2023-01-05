@@ -22,7 +22,7 @@ function CreateAlbum() {
     async function makePost() {
       try {
         const response = await axios.post(
-          "http://localhost:8000/create-album",
+          "http://localhost:8000/album/create-album",
           data
         );
         if (response.status == '200') {

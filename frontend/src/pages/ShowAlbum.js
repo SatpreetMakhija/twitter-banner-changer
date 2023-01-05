@@ -9,6 +9,7 @@ function ShowAlbum() {
   const album_id = url_parameters.albumid;
   const [albumData, setalbumData] = useState(null);
   const [doesAlbumExist, setDoesAlbumExist] = useState(false);
+  const [isCurrentAlbumInRotation, setIsCurrentAlbumInRotation] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -20,6 +21,9 @@ function ShowAlbum() {
         if (response.status == "200") {
           setalbumData(response.data.album);
           setDoesAlbumExist(true);
+          if (response.data.isCurrentAlbumInRotation == true) {
+            setIsCurrentAlbumInRotation(true);
+          } 
         } else {
           setDoesAlbumExist(false);
         }
@@ -42,7 +46,9 @@ function ShowAlbum() {
 
   return (
     <div>
+      
       {albumData && <AlbumButtons />}
+      {isCurrentAlbumInRotation && <h1>This is your current album in rotation with a {albumData.frequencyOfUpdateInHours} hour update frequency.</h1>}
       {albumData ? <Albums /> : "loading..."}
       {!doesAlbumExist && `This album does not exist`};
     </div>
