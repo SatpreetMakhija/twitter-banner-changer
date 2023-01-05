@@ -36,6 +36,18 @@ function Home() {
         
       }
       })
+
+      async function getJobs() {
+        try {
+          const jobs = await axios.get("http://localhost:8000/user/jobs", {withCredentials: true});
+          //TODO Add UI to show jobs.
+        } catch(err) {
+          console.log(err);
+        }
+      };
+
+      getJobs();
+
     }
 
     useEffect(checkUserLoginStatus, []);

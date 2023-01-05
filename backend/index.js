@@ -12,6 +12,7 @@ mongoose.connect(process.env.MONGODB_URL);
 const albumsRouter = require('./routes/albums');
 const authRouter = require('./routes/auth');
 const adminRouter = require('./routes/admin');
+const userRouter = require('./routes/user');
 const errorHandler = require('./middlewares/errorHandler');
 const CLIENT_HOMEPAGE_URL = "http://localhost:3000";
 
@@ -69,6 +70,10 @@ app.get("/*", function (req, res, next) {
 
 const adminCheck = require('./middlewares/adminCheck');
 const authCheck = require('./middlewares/authCheck');
+
+
+
+app.use("/user", userRouter);
 
 
 app.use("/dash", authCheck, adminCheck, Agendash(agenda));
