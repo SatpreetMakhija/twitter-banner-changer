@@ -11,6 +11,7 @@ const MongoStore = require("connect-mongo");
 mongoose.connect(process.env.MONGODB_URL);
 const albumsRouter = require('./routes/albums');
 const authRouter = require('./routes/auth');
+const adminRouter = require('./routes/admin');
 const errorHandler = require('./middlewares/errorHandler');
 const CLIENT_HOMEPAGE_URL = "http://localhost:3000";
 
@@ -66,14 +67,17 @@ app.get("/*", function (req, res, next) {
 
 
 
-const adminCheck = require('./middlewares/AdminCheck');
+const adminCheck = require('./middlewares/adminCheck');
 const authCheck = require('./middlewares/authCheck');
 
-app.use("/dash", adminCheck, Agendash(agenda));
 
-app.get("/admin", authCheck, adminCheck, (req, res, next) => {
-  res.json({message: "user is admin. "});
-})
+app.use("/dash", authCheck, adminCheck, Agendash(agenda));
+
+app.use("/admin", adminRouter);
+
+// app.get("/admin", authCheck, adminCheck, (req, res, next) => {
+//   res.json({message: "user is admin. "});
+// })
 
 
 
