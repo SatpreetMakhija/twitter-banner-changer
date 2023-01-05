@@ -13,6 +13,7 @@
     "@bull-board/express": "^4.6.4",
     "@stdlib/string-percent-encode": "^0.0.9",
     "agenda": "^5.0.0",
+    "agendash": "^3.1.0",
     "axios": "^1.2.0",
     "body-parser": "^1.20.1",
     "bull": "^4.10.2",

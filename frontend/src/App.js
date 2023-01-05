@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import CreateAlbum from './pages/CreateAlbum';
 import ShowAlbum from './pages/ShowAlbum';
 import ShowImg from './pages/ShowImg';
+import Admin from "./pages/Admin";
 function App() { 
   return (
     <div>
@@ -17,7 +18,8 @@ function App() {
             <Route path = "/create-album" element={<CreateAlbum/>}/>
             <Route path= "/showimg" element = {<ShowImg/>}/>
             <Route path = "/album/:albumid" element={<ShowAlbum/>}/>
-          </Routes>
+           <Route path = "/admin" element = {<Admin/>}/>
+                    </Routes>
         </BrowserRouter>
       
 

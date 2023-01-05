@@ -14,6 +14,8 @@ const authRouter = require('./routes/auth');
 const errorHandler = require('./middlewares/errorHandler');
 const CLIENT_HOMEPAGE_URL = "http://localhost:3000";
 
+const Agendash = require('agendash');
+const agenda = require('./utils/agenda');
 
 const app = express();
 
@@ -61,6 +63,8 @@ app.get("/*", function (req, res, next) {
     next();
   }
 });
+
+app.use("/dash", Agendash(agenda));
 
 const authCheck = (req, res, next) => {
   if (!req.user) {
