@@ -7,8 +7,7 @@ const {default: axios} = require('axios');
 
 
 module.exports = function(agenda) {
-    agenda.define("change twitter banner", function (job) {
-    
+    agenda.define("change twitter banner", function (job, done) {
         const albumId = job.attrs.data.albumId;
         const bannersURLsCounter = job.attrs.data.bannersURLsCounter;
         const userId = job.attrs.data.userId;
@@ -27,10 +26,10 @@ module.exports = function(agenda) {
                 let response = await axios(config);
                 console.log(response.status);
             } catch (err) {
-                console.log(err);
+                done(new Error("[Job Fail]: Twitter API call failed"));
             }
             } else {
-                console.log("Such an album does not exist.");
+                done(new Error("[Job Fail]: Album not found."));
             }
       
         })
