@@ -64,31 +64,12 @@ app.get("/*", function (req, res, next) {
   }
 });
 
-app.use("/dash", Agendash(agenda));
-
-const authCheck = (req, res, next) => {
-  if (!req.user) {
-    res.json({
-      authentication: false,
-      message: "User has not been authenticated",
-    });
-  } else {
-    next();
-  }
-};
 
 
-const adminCheck = (req, res, next) => {
+const adminCheck = require('./middlewares/AdminCheck');
+const authCheck = require('./middlewares/authCheck');
 
-  const isAdmin = req.user.isAdmin;
-  console.log(isAdmin);
-  if (isAdmin) {
-    next();
-  } else {
-    res.status("403");
-    res.json({message: "User is not admin."});
-  }
-}
+app.use("/dash", adminCheck, Agendash(agenda));
 
 app.get("/admin", authCheck, adminCheck, (req, res, next) => {
   res.json({message: "user is admin. "});

@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from "react";
 import axios from "axios";
+import { Button } from "react-bootstrap";
 function Admin() {
 
     const [isAdmin, setIsAdmin] = useState(null);
@@ -26,12 +27,21 @@ function Admin() {
     }, []);
 
 
+    function fetchJobs() {
+        window.location.href="http://localhost:8000/dash";
+    }
+
+
+    const adminPage = <div>
+        <div>This is the admin page, brother.</div>
+        <Button onClick={fetchJobs}>Jobs</Button>
+    </div>
 
 
     return (
 
         <div>
-            {isAdmin ? (<h1>This is the admin page</h1>) : (<h1>Loadin...</h1>)}
+            {isAdmin ? (adminPage) : (<h1>Loadin...</h1>)}
         </div>
     )
 };
