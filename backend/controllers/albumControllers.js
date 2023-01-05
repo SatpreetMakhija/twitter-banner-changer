@@ -31,7 +31,7 @@ const getAlbumController = (req, res, next) => {
   const albumId = req.params.albumid;
   User.findById(req.user._id, (err, user) => {
     if (err) {
-      console.log("Could not find a user with this user id");
+      res.status(500).send({errorCode: "INTERNAL_SERVER_ERROR"});
     } else {
       let album = user.albums.find((album) => album._id.toString() === albumId);
       if (album) {
@@ -41,8 +41,7 @@ const getAlbumController = (req, res, next) => {
           res.send({ album: album, isCurrentAlbumInRotation: false });
         }
       } else {
-        res.status(404);
-        res.send({ message: "You don't have an album with this id" });
+        res.status(404).send({errorCode: "ALBUM_NOT_FOUND"});
       }
     }
   });
