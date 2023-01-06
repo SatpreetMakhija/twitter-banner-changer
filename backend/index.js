@@ -101,6 +101,9 @@ app.use('/album', albumsRouter);
 
 app.use('/auth', authRouter);
 
+app.get('/test-error', (req, res, next) => {
+  res.status(413).send({message: "There was an error"});
+})
 
 app.use(errorHandler);
 

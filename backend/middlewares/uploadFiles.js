@@ -14,6 +14,7 @@ const upload = multer({
   limits: {
     //in bytes (approx 1 MB)
     fileSize: 1024 * 1024,
+    files: 4
   },
   fileFilter: (req, file, cb) => {
     console.log("fileFilter is called...");
@@ -22,8 +23,9 @@ const upload = multer({
       console.log("pass");
       cb(null, true);
     } else {
-      console.log("not pass");
-      cb("There exists a file that is not supported", false);
+      const err = new Error("File type not supported");
+      err.code = "FILE_TYPE_NOT_SUPPORTED";
+      cb(err);
     }
   },
 });

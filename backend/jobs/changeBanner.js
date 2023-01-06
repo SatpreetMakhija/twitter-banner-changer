@@ -7,8 +7,7 @@ const {default: axios} = require('axios');
 
 
 module.exports = function(agenda) {
-    agenda.define("change twitter banner", function (job) {
-    
+    agenda.define("change twitter banner", function (job, done) {
         const albumId = job.attrs.data.albumId;
         const bannersURLsCounter = job.attrs.data.bannersURLsCounter;
         const userId = job.attrs.data.userId;
