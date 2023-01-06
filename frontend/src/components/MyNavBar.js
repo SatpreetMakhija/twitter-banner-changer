@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {Container, Navbar, Button, Image} from 'react-bootstrap';
 import useStore from "../Store";
 import axios from "axios";
 import './MyNavBar.css'
+import NotificationOverlay from "./NotificationOverlay";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import { Popover } from "react-bootstrap";
+
 function MyNavBar () {
 
 
@@ -10,6 +14,7 @@ function MyNavBar () {
     const userLoginStatus = useStore(state => state.user);
     const resetUserLoginStatus = useStore(state => state.resetUserLoginStatus);
     const resetUser = useStore(state => state.resetUser);
+    const [lastFewBannerChangeJobs, setLastFewBannerChangeJobs] = useState(null);
 
     const  logOutUser = async () => {
       const response = await axios.get("http://localhost:8000/logout", {withCredentials: true})
@@ -26,6 +31,21 @@ function MyNavBar () {
     
     }
     
+    useEffect(() => {
+      
+      async function fetchLastJobs() {
+        try {
+          let response = await axios.get("http://localhost:8000/user/jobs", {withCredentials: true});
+          setLastFewBannerChangeJobs(response.data.userJobs);
+        } catch(err) {
+          console.log(err);
+        }
+      }
+
+      fetchLastJobs();
+
+    }, []);
+
 
     return (
         <React.Fragment>
@@ -34,8 +54,12 @@ function MyNavBar () {
           <Navbar.Brand href="/"><h2>Twitter Banner Changer</h2></Navbar.Brand>
           <Navbar.Toggle />
           <Navbar.Collapse className="justify-content-end">
+          {lastFewBannerChangeJobs && <OverlayTrigger trigger="click" placement="bottom" overlay={NotificationOverlay({lastFewBannerChangeJobs: lastFewBannerChangeJobs})} rootClose={true}>
+    <Button variant="success" >Notifications</Button>
+  </OverlayTrigger>}
             <Navbar.Text>
               {/* Signed in as: <a href="#login">Mark Otto</a> */}
+              
               {userLoginStatus ? user.name : ""}
             </Navbar.Text>
             {userLoginStatus ? <Navbar.Text>
