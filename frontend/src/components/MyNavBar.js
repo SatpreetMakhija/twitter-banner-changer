@@ -49,7 +49,8 @@ function MyNavBar () {
 
     return (
         <React.Fragment>
-        <Navbar className='color-nav' variant='light' expand='lg' style={{height:"10vh"}}  >
+        <Navbar className='color-nav' variant='light' expand='lg' style={{height:"10vh", position: "fixed", width: "100vw"}} >
+        
         <Container>
           <Navbar.Brand href="/"><h2>Twitter Banner Changer</h2></Navbar.Brand>
           <Navbar.Toggle />
@@ -59,13 +60,12 @@ function MyNavBar () {
   </OverlayTrigger>}
             <Navbar.Text>
               {/* Signed in as: <a href="#login">Mark Otto</a> */}
-              
-              {userLoginStatus ? user.name : ""}
+              {userLoginStatus && user.name }
             </Navbar.Text>
-            {userLoginStatus ? <Navbar.Text>
+            {userLoginStatus && <Navbar.Text>
               <Image src={user.profileImageUrl} roundedCircle/>
               <Button onClick={logOutUser}>Logout</Button>
-            </Navbar.Text> : ""}
+            </Navbar.Text>}
             
           </Navbar.Collapse>
         </Container>
