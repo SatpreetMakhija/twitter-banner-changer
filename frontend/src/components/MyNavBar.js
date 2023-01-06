@@ -29,7 +29,8 @@ function MyNavBar () {
 
     return (
         <React.Fragment>
-        <Navbar className='color-nav' variant='light' expand='lg' style={{height:"10vh"}}  >
+        <Navbar className='color-nav' variant='light' expand='lg' style={{height:"10vh", position: "fixed", width: "100vw"}} >
+        
         <Container>
           <Navbar.Brand href="/"><h2>Twitter Banner Changer</h2></Navbar.Brand>
           <Navbar.Toggle />
