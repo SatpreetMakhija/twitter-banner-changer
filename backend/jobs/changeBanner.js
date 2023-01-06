@@ -27,10 +27,12 @@ module.exports = function(agenda) {
                 let response = await axios(config);
                 console.log(response.status);
             } catch (err) {
-                console.log(err);
+                job.fail('Twitter API call to change banner failed.')
+                await job.save();
             }
             } else {
-                console.log("Such an album does not exist.");
+                job.fail('Album not found');
+                await job.save();
             }
       
         })
