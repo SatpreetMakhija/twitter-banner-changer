@@ -37,12 +37,12 @@ function MyNavBar () {
           <Navbar.Collapse className="justify-content-end">
             <Navbar.Text>
               {/* Signed in as: <a href="#login">Mark Otto</a> */}
-              {userLoginStatus ? user.name : ""}
+              {userLoginStatus && user.name }
             </Navbar.Text>
-            {userLoginStatus ? <Navbar.Text>
+            {userLoginStatus && <Navbar.Text>
               <Image src={user.profileImageUrl} roundedCircle/>
               <Button onClick={logOutUser}>Logout</Button>
-            </Navbar.Text> : ""}
+            </Navbar.Text>}
             
           </Navbar.Collapse>
         </Container>
