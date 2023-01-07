@@ -3,7 +3,7 @@ import { Container, Row, Col, Navbar } from 'react-bootstrap';
 
 function Footer() {
   return (
-    <Navbar bg="light" >
+    <Navbar bg="light" fixed="bottom" >
       <Container>
         <Row>
           <Col>

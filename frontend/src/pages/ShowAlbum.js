@@ -45,7 +45,7 @@ function ShowAlbum() {
   };
 
   return (
-    <div>
+    <div style={{position:"relative", top:"15vh"}}>
       
       {albumData && <AlbumButtons />}
       {isCurrentAlbumInRotation && <h1>This is your current album in rotation with a {albumData.frequencyOfUpdateInHours} hour update frequency.</h1>}

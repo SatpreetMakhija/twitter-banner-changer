@@ -76,7 +76,7 @@ function CreateAlbum() {
   };
 
   return (
-    <div >
+    <div   style={{position:"relative", top:"15vh"}}>
       <Card style={{ padding: "300px" }} >
         <Form style={{ margin: "20px" }} onSubmit={handleSubmit}>
           <Form.Control
