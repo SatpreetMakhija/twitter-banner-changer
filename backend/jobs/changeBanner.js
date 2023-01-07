@@ -24,6 +24,7 @@ module.exports = function(agenda) {
             let config = getConfigForTwitterAPICall(process.env.TWITTER_CONSUMER_KEY, process.env.TWITTER_CONSUMER_SECRET, accessToken, tokenSecret, "POST", bannerImgPath, baseURL);
             try {
                 let response = await axios(config);
+                done();
                 console.log(response.status);
             } catch (err) {
                 job.fail('Twitter API call to change banner failed.')
