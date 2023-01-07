@@ -7,6 +7,7 @@ import CreateAlbum from './pages/CreateAlbum';
 import ShowAlbum from './pages/ShowAlbum';
 import ShowImg from './pages/ShowImg';
 import Admin from './pages/Admin';
+import Footer from './components/Footer'
 function App() { 
   return (
     <div>
@@ -22,6 +23,7 @@ function App() {
             <Route path = "/admin" element={<Admin/>}/>
             <Route path="*" element={<Home/>}/>
           </Routes>
+          <Footer/>
         </BrowserRouter>
       
 
