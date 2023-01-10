@@ -24,7 +24,7 @@ function SetAlbumModal(props) {
     //call api set-album
     try {
       let response = await axios.post(
-        "http://localhost:8000/api/album/set-album",
+        process.env.REACT_APP_HOST+"/api/album/set-album",
         {
           albumId: album_id,
           bannerUpdateFrequency: bannerUpdateFrequency,

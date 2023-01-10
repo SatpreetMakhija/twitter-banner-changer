@@ -22,7 +22,7 @@ function CreateAlbum() {
 
     async function makePost() {
       try {
-        const response = await axios.post("http://localhost:8000/api/album/create-album", data);
+        const response = await axios.post(process.env.REACT_APP_HOST+"/api/album/create-album", data);
         setShowToast(true);
         setTimeout(() => {
           window.location.href = "/"

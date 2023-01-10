@@ -18,7 +18,7 @@ function DeleteAlbumModal(props) {
   const handleDeleteAlbum = async () => {
     try {
       let response = await axios.delete(
-        "http://localhost:8000/api/album/delete-album",
+        process.env.REACT_APP_HOST+"/api/album/delete-album",
         {data : {
           albumId: album_id,
         }},

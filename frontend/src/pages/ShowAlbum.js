@@ -15,7 +15,7 @@ function ShowAlbum() {
     async function fetchData() {
       try {
         let response = await axios.get(
-          "http://localhost:8000/api/album/" + album_id,
+          process.env.REACT_APP_HOST+"/api/album/" + album_id,
           { withCredentials: true }
         );
         if (response.status == "200") {
@@ -38,7 +38,7 @@ function ShowAlbum() {
     return (
       <Stack gap={3} style={{ margin: "5vw", alignContent: "center" }}>
         {albumData.bannersURLs.map((url) => (
-          <img src={"http://localhost:8000/" +   url} style={{ width: "80vw" }} />
+          <img src={process.env.REACT_APP_HOST+  "/" +   url} style={{ width: "80vw" }} />
         ))}
       </Stack>
     );

@@ -17,7 +17,7 @@ function MyNavBar () {
     const [lastFewBannerChangeJobs, setLastFewBannerChangeJobs] = useState(null);
 
     const  logOutUser = async () => {
-      const response = await axios.get("http://localhost:8000/api/logout", {withCredentials: true})
+      const response = await axios.get(process.env.REACT_APP_HOST+"/api/logout", {withCredentials: true})
       if (response.data.message === "userLoggedOut") {
         console.log("user is logged out..")
         resetUserLoginStatus();
@@ -35,7 +35,7 @@ function MyNavBar () {
       
       async function fetchLastJobs() {
         try {
-          let response = await axios.get("http://localhost:8000/api/user/jobs", {withCredentials: true});
+          let response = await axios.get(process.env.REACT_APP_HOST+"/api/user/jobs", {withCredentials: true});
           setLastFewBannerChangeJobs(response.data.userJobs);
         } catch(err) {
           console.log(err);

@@ -10,7 +10,7 @@ function Admin() {
         async function fetchIsAdmin() {
             try {
                 
-                let response = await axios.get("http://localhost:8000/api/admin", {withCredentials: true} );
+                let response = await axios.get(process.env.REACT_APP_HOST + "/api/admin", {withCredentials: true} );
                 if (response.status == "200") {
                     setIsAdmin(true);
                 } 
@@ -28,7 +28,7 @@ function Admin() {
 
 
     function fetchJobs() {
-        window.location.href="http://localhost:8000/api/dash";
+        window.location.href=process.env.REACT_APP_HOST+"/api/dash";
     }
 
 
