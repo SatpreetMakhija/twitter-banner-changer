@@ -19,7 +19,7 @@ function Home() {
 
     const checkUserLoginStatus = () => {
       console.log("inside useffect");
-      axios.get("http://localhost:8000/auth/login/success", {withCredentials: true}).then((response) =>{
+      axios.get("http://localhost:8000/api/auth/login/success", {withCredentials: true}).then((response) =>{
 
       if (response.status === 404) {
         console.log("No user found")
@@ -39,7 +39,7 @@ function Home() {
 
       async function getJobs() {
         try {
-          const jobs = await axios.get("http://localhost:8000/user/jobs", {withCredentials: true});
+          const jobs = await axios.get("http://localhost:8000/api/user/jobs", {withCredentials: true});
           //TODO Add UI to show jobs.
         } catch(err) {
           console.log(err);
@@ -65,7 +65,7 @@ function Home() {
 
   const setLoginStatus = () => {
     console.log("onclick called")
-    window.open("http://localhost:8000/auth/twitter", "_self");
+    window.open("http://localhost:8000/api/auth/twitter", "_self");
     
   
   }

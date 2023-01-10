@@ -73,12 +73,12 @@ const authCheck = require('./middlewares/authCheck');
 
 
 
-app.use("/user", userRouter);
+app.use("/api/user", userRouter);
 
 
-app.use("/dash", authCheck, adminCheck, Agendash(agenda));
+app.use("/api/dash", authCheck, adminCheck, Agendash(agenda));
 
-app.use("/admin", adminRouter);
+app.use("/api/admin", adminRouter);
 
 // app.get("/admin", authCheck, adminCheck, (req, res, next) => {
 //   res.json({message: "user is admin. "});
@@ -86,7 +86,7 @@ app.use("/admin", adminRouter);
 
 
 
-app.get("/logout", authCheck, (req, res, next) => {
+app.get("/api/logout", authCheck, (req, res, next) => {
   req.logout(function (err) {
     if (err) {
       return next(err);
@@ -96,14 +96,10 @@ app.get("/logout", authCheck, (req, res, next) => {
   });
 });
 
-app.use('/album', albumsRouter);
+app.use('/api/album', albumsRouter);
 
 
-app.use('/auth', authRouter);
-
-app.get('/test-error', (req, res, next) => {
-  res.status(413).send({message: "There was an error"});
-})
+app.use('/api/auth', authRouter);
 
 app.use(errorHandler);
 

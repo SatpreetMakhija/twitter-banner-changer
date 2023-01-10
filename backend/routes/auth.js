@@ -19,8 +19,8 @@ router.get("/login-fail", (req, res, next) => {
 router.get(
     "/twitter/callback",
     passport.authenticate("twitter", {
-      successRedirect: "/auth/login-success",
-      failureRedirect: "/auth/login-fail",
+      successRedirect: "/api/auth/login-success",
+      failureRedirect: "/api/auth/login-fail",
     })
   );
 
