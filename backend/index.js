@@ -5,10 +5,10 @@ const session = require("express-session");
 const { default: mongoose } = require("mongoose");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-require("dotenv").config();
-require("./utils/passport-setup");
 const config = require('./config');
 console.log(config);
+require("./utils/passport-setup");
+
 const MongoStore = require("connect-mongo");
 mongoose.connect(config.MONGODB_URL);
 const albumsRouter = require('./routes/albums');
@@ -106,7 +106,7 @@ app.use('/api/auth', authRouter);
 app.use(errorHandler);
 
 app.listen(config.PORT, () => {
-  console.log("Server is up and running at port 8000");
+  console.log(`Server is up and running at port ${config.PORT}`);
 });
 
 /**
