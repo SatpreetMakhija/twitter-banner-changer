@@ -23,7 +23,7 @@ function Notification(props) {
         </Card>)
         } else {
             return (<Card bg="success">
-            <Card.Body>Banner changed at {jobData.lastFinishedAt}</Card.Body>
+            <Card.Body>Banner changed at {convertGMTToLocal(new Date(jobData.lastFinishedAt))}</Card.Body>
           </Card>)
         }
     })}
