@@ -1,6 +1,7 @@
 const { MongoClient } = require("mongodb");
 const ObjectId = require("mongodb").ObjectId;
-const client = new MongoClient(process.env.MONGODB_URL);
+const config = require('../config');
+const client = new MongoClient(config.MONGODB_URL);
 async function findJobsByUserId(userId, numberOfJobs = 5) {
   await client.connect();
   const db = client.db("test");

@@ -7,8 +7,10 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 require("./utils/passport-setup");
+const config = require('./config');
+console.log(config);
 const MongoStore = require("connect-mongo");
-mongoose.connect(process.env.MONGODB_URL);
+mongoose.connect(config.MONGODB_URL);
 const albumsRouter = require('./routes/albums');
 const authRouter = require('./routes/auth');
 const adminRouter = require('./routes/admin');
@@ -40,7 +42,7 @@ app.use(
       secure: "auto",
     },
     store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URL,
+      mongoUrl: config.MONGODB_URL,
     }),
   })
 );

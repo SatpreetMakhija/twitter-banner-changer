@@ -3,7 +3,7 @@ const path = require('path');
 const User = require('../models/user-model');
 const getConfigForTwitterAPICall = require('../utils/createConfigForBannerChangeRequest');
 const {default: axios} = require('axios');
-
+const config = require('../config');
 
 
 module.exports = function(agenda) {
@@ -21,9 +21,9 @@ module.exports = function(agenda) {
             let baseURL = "https://api.twitter.com/1.1/account/update_profile_banner.json"
             let accessToken = user.accessToken;
             let tokenSecret = user.tokenSecret;
-            let config = getConfigForTwitterAPICall(process.env.TWITTER_CONSUMER_KEY, process.env.TWITTER_CONSUMER_SECRET, accessToken, tokenSecret, "POST", bannerImgPath, baseURL);
+            let configForApiCall = getConfigForTwitterAPICall(config.TWITTER_CONSUMER_KEY, config.TWITTER_CONSUMER_SECRET, accessToken, tokenSecret, "POST", bannerImgPath, baseURL);
             try {
-                let response = await axios(config);
+                let response = await axios(configForApiCall);
                 done();
                 console.log(response.status);
             } catch (err) {

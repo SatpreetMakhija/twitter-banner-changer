@@ -1,8 +1,9 @@
 const Agenda = require("agenda");
 const User = require('../models/user-model');
+const config = require('../config');
 const agenda = new Agenda({
   db: {
-    address: process.env.MONGODB_URL,
+    address: config.MONGODB_URL,
     collection: "TwitterBannerChangeAPICallsQueue",
   },
   processEvery: "5 seconds",

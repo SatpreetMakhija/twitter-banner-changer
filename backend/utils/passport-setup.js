@@ -1,6 +1,7 @@
 const passport = require('passport');
 const TwitterStrategy = require('passport-twitter').Strategy;
 const User = require('../models/user-model');
+const config = require('../config');
 /**
  * 
  * serializeUser() is used to persist user data (after successful auth) into a session so that user data is not
@@ -41,9 +42,9 @@ passport.deserializeUser(function(userId, done){
  */
 
 passport.use(new TwitterStrategy({
-    consumerKey: process.env.TWITTER_CONSUMER_KEY,
-    consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-    callbackURL: "http://localhost:8000/api/auth/twitter/callback",
+    consumerKey: config.TWITTER_CONSUMER_KEY,
+    consumerSecret: config.TWITTER_CONSUMER_SECRET,
+    callbackURL: "http://" + config.HOST + ":" + config.PORT + "/api/auth/twitter/callback",
     pkce: true,
     state: true,
 },
