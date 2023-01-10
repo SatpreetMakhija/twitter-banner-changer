@@ -105,7 +105,7 @@ app.use('/api/auth', authRouter);
 
 app.use(errorHandler);
 
-app.listen(8000, () => {
+app.listen(config.PORT, () => {
   console.log("Server is up and running at port 8000");
 });
 
