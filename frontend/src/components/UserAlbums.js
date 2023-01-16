@@ -2,6 +2,7 @@ import react from "react";
 import {useNavigate} from "react-router-dom"
 import Stack from "react-bootstrap/Stack";
 import Button from "react-bootstrap/Button";
+import { Container, Row, Col } from "react-bootstrap";
 
 function UserAlbums(props) {
   
@@ -12,12 +13,15 @@ function UserAlbums(props) {
     navigate(path);
   } 
   
+
   return (
     <div style={{backgroundColor: "#C4DFDA"}}>
         <h1>Your albums </h1>
-      <Stack direction="horizontal" gap={3} style={{margin: "100px"}}>
-         {albums.length ? albums.map((album) => <Button variant="secondary" albumId = {album._id} onClick={routeChange}>{album.albumName} </Button>) : "You don't have any albums. Create one"}
-      </Stack>
+        <Container className="justify-content-center" style={{marginTop: "20vh"}}>
+      <Row>
+      {albums.map((album) => <Col><Button variant="secondary" albumId = {album._id} onClick={routeChange}>{album.albumName} </Button></Col>)}  
+      </Row>
+    </Container>
       
     </div>
   );
