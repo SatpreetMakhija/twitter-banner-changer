@@ -1,0 +1,15 @@
+.content-holder {
+    border-radius: 50px;
+    background-color:rgb(196, 223, 218);
+    height: 90vh;
+}
+
+
+.buttons-container {
+    padding-top: 3vh;
+}
+
+.album-status-container {
+    padding: 3vh;
+
+}
