@@ -13,7 +13,7 @@ function UserAlbums(props) {
   } 
   
   return (
-    <div>
+    <div style={{backgroundColor: "#C4DFDA"}}>
         <h1>Your albums </h1>
       <Stack direction="horizontal" gap={3} style={{margin: "100px"}}>
          {albums.length ? albums.map((album) => <Button variant="secondary" albumId = {album._id} onClick={routeChange}>{album.albumName} </Button>) : "You don't have any albums. Create one"}

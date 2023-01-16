@@ -3,6 +3,7 @@ import { Form, Col, Row, Card, Button } from "react-bootstrap";
 import { useState } from "react";
 import axios from "axios";
 import { Toast, ToastContainer } from "react-bootstrap";
+import './CreateAlbum.css'
 axios.defaults.withCredentials = true;
 function CreateAlbum() {
   const [formValues, setFormValues] = useState({ albumName: "", banners: [] });
@@ -76,8 +77,8 @@ function CreateAlbum() {
   };
 
   return (
-    <div   style={{position:"relative", top:"15vh"}}>
-      <Card style={{ padding: "300px" }} >
+    <div   className = "content-holder" >
+      <Card style={{backgroundColor: "#C4DFDA", padding: "200px", height:"90vh", borderRadius: "50px" }} className="content-holder" >
         <Form style={{ margin: "20px" }} onSubmit={handleSubmit}>
           <Form.Control
             size="lg"

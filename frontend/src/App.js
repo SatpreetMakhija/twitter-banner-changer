@@ -10,11 +10,12 @@ import Admin from './pages/Admin';
 import Footer from './components/Footer'
 function App() { 
   return (
-    <div>
+    <div className='App'>
 
       
         <BrowserRouter>
         <MyNavBar/>
+        <div className='custom-main'>
           <Routes>
             <Route path="/" exact element={<Home/>}/>
             <Route path = "/create-album" element={<CreateAlbum/>}/>
@@ -24,6 +25,9 @@ function App() {
             <Route path="*" element={<Home/>}/>
           </Routes>
           <Footer/>
+          </div>
+         
+          
         </BrowserRouter>
       
 

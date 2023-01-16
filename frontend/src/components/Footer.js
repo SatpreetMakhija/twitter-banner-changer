@@ -3,12 +3,12 @@ import { Container, Row, Col, Navbar } from 'react-bootstrap';
 
 function Footer() {
   return (
-    <Navbar bg="light" fixed="bottom" >
+    <Navbar bg="light">
       <Container>
         <Row>
           <Col>
             <Navbar.Text>
-              Copyright &copy; {new Date().getFullYear()}
+              Change My Banner, Inc. Copyright &copy; {new Date().getFullYear()}
             </Navbar.Text>
           </Col>
           {/* <Col className="text-right">

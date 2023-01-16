@@ -48,11 +48,11 @@ function MyNavBar () {
 
 
     return (
-        <React.Fragment>
-        <Navbar className='color-nav' variant='light' expand='lg' style={{height:"10vh", position: "fixed", width: "100vw"}} >
+       
+        <Navbar fixed="top" className='custom-nav-bar' variant='light' expand='lg'  >
         
         <Container>
-          <Navbar.Brand href="/"><h2>Twitter Banner Changer</h2></Navbar.Brand>
+          <Navbar.Brand href="/"><h2 style={{fontFamily: "Ligconsolata"}}>Change My Banner</h2></Navbar.Brand>
           <Navbar.Toggle />
           <Navbar.Collapse className="justify-content-end">
           {lastFewBannerChangeJobs && <OverlayTrigger trigger="click" placement="bottom" overlay={NotificationOverlay({lastFewBannerChangeJobs: lastFewBannerChangeJobs})} rootClose={true}>
@@ -70,7 +70,6 @@ function MyNavBar () {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      </React.Fragment>
     )
 }
 

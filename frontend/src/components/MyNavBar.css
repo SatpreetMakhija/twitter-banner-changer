@@ -1,3 +1,7 @@
-.color-nav {
-    background-color: #4d99af;
+.custom-nav-bar {
+    background-color: white;
+    margin-left:20vw;
+    margin-right:20vw;
+    height: 10vh;
+    width: 60vw;
 }
