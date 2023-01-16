@@ -79,7 +79,7 @@ function CreateAlbum() {
   return (
     <div   className = "content-holder" >
       <Card style={{backgroundColor: "#C4DFDA", padding: "200px", height:"90vh", borderRadius: "50px" }} className="content-holder" >
-        <Form style={{ margin: "20px" }} onSubmit={handleSubmit}>
+        <Form style={{ marginTop: "10vh" }} onSubmit={handleSubmit}>
           <Form.Control
             size="lg"
             type="text"
@@ -89,9 +89,10 @@ function CreateAlbum() {
             onChange={handleTextChange}
             required
           />
-
+          <br/>
+          <br/>
           <Form.Group controlId="formFileMultiple" className="mb-3">
-            <Form.Label>Multiple files input example</Form.Label>
+            {/* <Form.Label>Multiple files input example</Form.Label> */}
             <Form.Control
               type="file"
               multiple
