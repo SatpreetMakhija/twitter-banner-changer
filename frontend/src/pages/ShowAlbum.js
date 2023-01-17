@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Stack, Alert, Container, Row, Col } from "react-bootstrap";
+import { Stack, Alert, Container, Row, Col,Card } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import AlbumButtons from "../components/AlbumButtons";
@@ -81,6 +81,7 @@ function ShowAlbum() {
   };
 
   return (
+    <Card style={{borderRadius:"50px"}}>
     <div className="content-holder">
       <div className="buttons-container">{albumData && <AlbumButtons />}</div>
       <div className="album-status-container">
@@ -96,6 +97,7 @@ function ShowAlbum() {
         {!doesAlbumExist && `This album does not exist`};
       </div>
     </div>
+    </Card>
   );
 }
 

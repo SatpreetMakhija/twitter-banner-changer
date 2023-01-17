@@ -2,7 +2,7 @@ import React from "react";
 import Toast from "react-bootstrap/Toast";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-
+import { ToastContainer } from "react-bootstrap";
 
 function SetAlbumToast (props) {
 
@@ -12,17 +12,16 @@ function SetAlbumToast (props) {
     
     let toastBodyContent = (toastStatus === '200' ? "Album Set" : "Error occured, try again.")
     return (
-        <Row>
-      <Col xs={6}>
-        <Toast onClose={() => setShowToast({showToast: false})} show={showToast} delay={5000} autohide >
+       <ToastContainer position="top-end">
+        <Toast onClose={() => setShowToast({showToast: false})} show={showToast} delay={5000} autohide>
           <Toast.Header>
             <strong className="me-auto">Update</strong>
             <small>11 mins ago</small>
           </Toast.Header>
           <Toast.Body>{toastBodyContent}</Toast.Body>
         </Toast>
-      </Col>
-    </Row>)
+        </ToastContainer>
+      )
 };
 
 export default SetAlbumToast;
