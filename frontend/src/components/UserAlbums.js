@@ -19,7 +19,7 @@ function UserAlbums(props) {
         <h1>Your albums </h1>
         <Container className="justify-content-center" style={{marginTop: "20vh"}}>
       <Row>
-      {albums.map((album) => <Col><Button variant="secondary" albumId = {album._id} onClick={routeChange}>{album.albumName} </Button></Col>)}  
+      {albums && albums.map((album) => <Col key={album._id}><Button variant="secondary" albumId = {album._id} onClick={routeChange}>{album.albumName} </Button></Col>)}  
       </Row>
     </Container>
       
