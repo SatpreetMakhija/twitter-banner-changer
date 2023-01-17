@@ -3,11 +3,16 @@ import { Form, Col, Row, Card, Button } from "react-bootstrap";
 import { useState } from "react";
 import axios from "axios";
 import { Toast, ToastContainer } from "react-bootstrap";
-import './CreateAlbum.css'
+import './CreateAlbum.css';
+import ErrorToast from '../components/ErrorToast';
 axios.defaults.withCredentials = true;
 function CreateAlbum() {
   const [formValues, setFormValues] = useState({ albumName: "", banners: [] });
   const [showToast, setShowToast] = useState(false);
+  const [showErrorToast, setShowErrorToast] = useState({
+    status: false,
+    errorMessage: null
+  });
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -30,13 +35,13 @@ function CreateAlbum() {
         }, 3000);
       } catch (err) {
           if (err.response.data.errorCode == "LIMIT_FILE_SIZE") {
-            console.log("Show error toast with file size warning");
+            setShowErrorToast({status: true, errorMessage: "Each file must be less than 1 MB in size."});
           } else if (err.response.data.errorCode == "FILE_TYPE_NOT_SUPPORTED") {
-            console.log("Show error toast with file type warning");
+            setShowErrorToast({status: true, errorMessage: "File type not supported."});
           } else if (err.response.data.errorCode == "LIMIT_FILE_COUNT") {
-            console.log("Show error toast with #files limit warning");
+            setShowErrorToast({status: true, errorMessage: "You exceeded the number of banners you can have in an album."});
           } else {
-            console.log("An unexpected error occured. Give a generic error toast to try again");
+            setShowErrorToast({status: true, errorMessage: "Enexpected error. Please try again."});
           }
       }
     }
@@ -119,6 +124,7 @@ function CreateAlbum() {
         <Toast.Body>Your album was created successfully!</Toast.Body>
       </Toast>
       </ToastContainer>
+      <ErrorToast showErrorToast={showErrorToast} setShowErrorToast={setShowErrorToast} />
       </Card>
       
     </div>
