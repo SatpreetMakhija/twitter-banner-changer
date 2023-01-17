@@ -9,7 +9,7 @@ function UserAlbums(props) {
   const albums = props.albums;
   let navigate = useNavigate();
   const routeChange = (e) => {
-    let  path = "/album/" + e.target.getAttribute('albumId');
+    let  path = "/album/" + e.target.getAttribute('albumid');
     navigate(path);
   } 
   
@@ -19,7 +19,7 @@ function UserAlbums(props) {
         <h1>Your albums </h1>
         <Container className="justify-content-center" style={{marginTop: "20vh"}}>
       <Row>
-      {albums && albums.map((album) => <Col key={album._id}><Button variant="secondary" albumId = {album._id} onClick={routeChange}>{album.albumName} </Button></Col>)}  
+      {albums && albums.map((album) => <Col key={album._id}><Button variant="secondary" albumid = {album._id} onClick={routeChange}>{album.albumName} </Button></Col>)}  
       </Row>
     </Container>
       
