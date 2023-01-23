@@ -5,6 +5,7 @@ const session = require("express-session");
 const { default: mongoose } = require("mongoose");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
+const path = require('path');
 const config = require('./config');
 console.log(config);
 require("./utils/passport-setup");
@@ -24,7 +25,7 @@ const agenda = require('./utils/agenda');
 const app = express();
 
 app.use(express.static(__dirname + "/uploads"));
-
+app.use(express.static(path.join(__dirname, 'client/build')));
 app.use(bodyParser.json());
 /**
  * Initialize session using the express-session library. Later, we'll set
@@ -91,6 +92,8 @@ app.use("/api/admin", adminRouter);
 app.get("/api/logout", authCheck, (req, res, next) => {
   req.logout(function (err) {
     if (err) {
+      console.log("There was an error");
+      console.log(err);
       return next(err);
     } else {
       res.send({ message: "userLoggedOut" });
@@ -102,6 +105,11 @@ app.use('/api/album', albumsRouter);
 
 
 app.use('/api/auth', authRouter);
+
+
+app.get('*', (req, res, next) => {
+    res.sendFile(path.join(__dirname + '/client/build/index.html'));
+})
 
 app.use(errorHandler);
 

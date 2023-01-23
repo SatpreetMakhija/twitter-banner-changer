@@ -2,13 +2,13 @@ const { application } = require('express');
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const CLIENT_HOMEPAGE_URL = "http://localhost:3000";
+const config = require('../config');
 
 router.get("/twitter", passport.authenticate("twitter"));
 
 
 router.get("/login-success", (req, res, next) => {
-    res.redirect(CLIENT_HOMEPAGE_URL);
+    res.redirect("http://" + config.HOST + ":" + config.PORT ) ;
   });
   
 router.get("/login-fail", (req, res, next) => {
@@ -37,7 +37,7 @@ router.get("/login/success", (req, res, next) => {
     } else {
       console.log("user is NOT found");
       res.status(201);
-      res.status({ message: "No user found" });
+      res.send({ message: "No user found" });
     }
     next();
   });
